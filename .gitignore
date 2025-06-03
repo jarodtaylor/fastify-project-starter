@@ -1,0 +1,23 @@
+# Node
+node_modules
+.pnpm
+.pnpm-debug.log
+.env
+.env.*.local
+
+# Output
+dist
+build
+.next
+out
+.cache
+turbo
+
+# IDEs
+.vscode
+.idea
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db

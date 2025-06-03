@@ -1,0 +1,24 @@
+{
+	"name": "localpro-platform",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"lint": "biome lint .",
+		"format": "biome format . --write",
+		"typecheck": "tsc --noEmit",
+		"test": "turbo run test",
+		"audit": "pnpm audit",
+		"check": "biome check . && pnpm typecheck",
+		"precheck": "pnpm lint && pnpm format && pnpm check && pnpm test && pnpm audit"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.11.1",
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"turbo": "^2.5.4",
+		"typescript": "^5.8.3"
+	}
+}
