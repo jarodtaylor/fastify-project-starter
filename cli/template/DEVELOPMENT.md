@@ -1,0 +1,136 @@
+# Development Guide
+
+This document tracks the development progress and architecture decisions for the Fastify + React Router 7 monorepo starter.
+
+> **For Contributors**: See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed development setup, testing procedures, and contribution guidelines.
+
+## ✅ Completed Features
+
+### Core Infrastructure
+
+- [x] **Monorepo Setup**: Turborepo + pnpm workspaces
+- [x] **TypeScript Configuration**: Shared configs across packages
+- [x] **Linting & Formatting**: Biome for consistent code style
+- [x] **Development Tooling**: Hot reload, type checking, parallel builds
+
+### Backend (Fastify API)
+
+- [x] **Fastify Server**: Modern Node.js API framework
+- [x] **Database Integration**: Prisma ORM with SQLite (easily switchable)
+- [x] **Shared Database Package**: Reusable across multiple API apps
+- [x] **CRUD Operations**: Complete Todo API with validation
+- [x] **Error Handling**: Consistent error responses
+- [x] **Environment Configuration**: Proper env var management
+
+### Frontend (React Router 7)
+
+- [x] **React Router 7**: Latest routing with SSR support
+- [x] **Tailwind CSS**: Modern styling with responsive design
+- [x] **Form Handling**: Server-side form actions
+- [x] **Optimistic UI**: Immediate feedback with error handling
+- [x] **Todo Application**: Complete CRUD interface
+
+### CLI Generator ✨
+
+- [x] **CLI Package**: `create-fastify-react-router` generator
+- [x] **Template System**: Uses main project as living template
+- [x] **Variable Replacement**: Customizes package names and scopes
+- [x] **Interactive Options**: Database, ORM, linting choices
+- [x] **Project Initialization**: Dependencies, git, database setup
+- [x] **NPM Publishing**: Published to npm registry as `create-fastify-react-router@1.0.0`
+- [x] **Documentation Cleanup**: User-focused README, proper contributing guidelines
+- [x] **Open Source Ready**: Clear project structure and contribution workflow
+
+## 🚀 CLI Usage
+
+The CLI is now **live and published** on npm! Anyone can use:
+
+```bash
+# Create a new project
+npx create-fastify-react-router my-app
+
+# With options
+npx create-fastify-react-router my-app --db postgres --lint eslint
+```
+
+**Status**: ✅ **Production Ready** - CLI is published and generating projects successfully
+
+## 📋 Next Steps
+
+### CLI Enhancements
+
+- [ ] **Interactive Prompts**: Full inquirer.js integration for better UX
+- [ ] **Template Variants**: Multiple starter templates (minimal, full-featured, etc.)
+- [ ] **Package Manager Choice**: Support for npm, yarn, bun
+- [ ] **Deployment Options**: Vercel, Railway, Docker configurations
+- [ ] **Testing Setup**: Jest/Vitest configuration options
+
+### Template Improvements
+
+- [ ] **Authentication**: Auth package with multiple providers
+- [ ] **API Documentation**: OpenAPI/Swagger integration
+- [ ] **Testing Examples**: Unit, integration, and E2E test examples
+- [ ] **CI/CD Templates**: GitHub Actions, GitLab CI configurations
+- [ ] **Monitoring**: Logging, metrics, and error tracking setup
+
+### Publishing
+
+- [x] **NPM Publishing**: Published as `create-fastify-react-router@1.0.0` ✅
+- [ ] **GitHub Release**: Automated releases with changelog
+- [ ] **Documentation Site**: Comprehensive docs with examples
+- [ ] **Video Tutorials**: Getting started and advanced usage
+
+## 🏗️ Architecture Decisions
+
+### Database Package Strategy
+
+**Decision**: Create a shared `packages/database` instead of per-app databases.
+**Rationale**: Enables multiple API apps to share the same database schema while maintaining clean separation. Easy to split later if needed.
+
+### Template Approach
+
+**Decision**: Use the main project as the template source.
+**Rationale**: Ensures the template is always up-to-date and functional. No need to maintain separate template files.
+
+### CLI Implementation
+
+**Decision**: Build CLI as a separate package within the monorepo.
+**Rationale**: Keeps CLI code organized while allowing it to use the main project as a template. Easy to test and develop.
+
+## 🧪 Testing the CLI
+
+```bash
+# Build the CLI
+cd cli && pnpm build
+
+# Test locally
+node dist/index.js test-project --no-install --no-git
+
+# Test full flow
+node dist/index.js my-app
+cd my-app && pnpm install && pnpm dev
+```
+
+## 📦 Package Structure
+
+```
+fastify-react-router-starter/
+├── apps/
+│   ├── api/              # Fastify API server
+│   └── web/              # React Router 7 frontend
+├── packages/
+│   ├── database/         # Shared Prisma database
+│   ├── shared-utils/     # Shared utilities
+│   ├── typescript-config/# Shared TypeScript config
+│   └── ui/               # Shared UI components
+├── cli/                  # CLI generator package
+│   ├── src/              # CLI source code
+│   ├── dist/             # Built CLI
+│   └── README.md         # CLI documentation
+├── data/                 # SQLite database files
+├── package.json          # Root package.json
+├── turbo.json            # Turborepo configuration
+└── pnpm-workspace.yaml   # Workspace configuration
+```
+
+This starter is now production-ready and includes everything needed to build modern fullstack applications with a powerful CLI generator for rapid project creation.

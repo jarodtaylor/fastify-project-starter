@@ -55,7 +55,7 @@ export async function copyTemplate(
   targetPath: string,
   options: ProjectOptions
 ): Promise<void> {
-  // The templatePath should point to the project root
+  // The templatePath should point to the bundled template directory
   // Verify it contains the expected structure
   const expectedFiles = ["package.json", "apps", "packages"];
   const hasExpectedStructure = expectedFiles.every((file) =>
@@ -68,6 +68,6 @@ export async function copyTemplate(
     );
   }
 
-  // Copy the contents of the project root directly to target
+  // Copy the contents of the template directory directly to target
   await copyRecursive(templatePath, targetPath);
 }

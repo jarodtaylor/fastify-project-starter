@@ -39,7 +39,7 @@ export async function createProject(
 
   // Copy template files
   spinner.start("Copying template files...");
-  const templatePath = resolve(__dirname, "../..");
+  const templatePath = resolve(__dirname, "../template");
   await copyTemplate(templatePath, projectPath, options);
   spinner.succeed("Copied template files");
 
