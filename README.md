@@ -7,6 +7,7 @@ A modern, production-ready monorepo template for building fullstack applications
 - **Monorepo**: Using [pnpm workspaces](https://pnpm.io/workspaces) + [Turborepo](https://turborepo.com/docs)
 - **API Backend**: [Fastify](https://fastify.dev/) with TypeScript and hot reload
 - **Frontend**: [React Router 7](https://reactrouter.com/home) with SSR and [Tailwind 4](https://tailwindcss.com/docs)
+- **Database**: [Prisma](https://prisma.io/) ORM with SQLite (easily switchable to PostgreSQL/MySQL)
 - **Developer Experience**: [Biome](https://biomejs.dev/) for formatting and linting
 - **Package Management**: Clean `@` imports with path mapping
 - **Quality Gates**: Pre-commit checks for formatting, linting, type safety, and tests
@@ -18,8 +19,10 @@ A modern, production-ready monorepo template for building fullstack applications
 │   ├── api/                 # Fastify API server
 │   └── web/                 # React Router 7 frontend
 ├── packages/
+│   ├── database/            # Shared Prisma database package
 │   ├── shared-utils/        # Shared utilities and types
 │   └── typescript-config/   # Base TypeScript configuration
+├── data/                    # SQLite database files
 ├── biome.json              # Linting and formatting config
 ├── turbo.json              # Build orchestration
 └── pnpm-workspace.yaml     # Workspace configuration
@@ -35,11 +38,19 @@ A modern, production-ready monorepo template for building fullstack applications
 ### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/jarodtaylor/fastify-react-router-starter.git
+cd fastify-react-router-starter
+
 # Install dependencies
 pnpm install
 
-# Approve build scripts (for Tailwind native components)
-pnpm approve-builds
+# Set up environment variables
+cp .env.example .env
+
+# Generate Prisma client and create database
+DATABASE_URL="file:./data/dev.db" npx prisma generate --schema=packages/database/prisma/schema.prisma
+DATABASE_URL="file:./data/dev.db" npx prisma db push --schema=packages/database/prisma/schema.prisma
 ```
 
 ### Development
@@ -85,7 +96,17 @@ pnpm audit       # Security audit
 
 ```typescript
 import { createApiResponse } from "@fastify-react-router-starter/shared-utils";
+import { getTodos, createTodo } from "@fastify-react-router-starter/database";
 ```
+
+### Database Integration
+
+The template includes a shared database package with:
+
+- **Prisma ORM** with TypeScript types
+- **SQLite** for zero-config development
+- **Shared utilities** for CRUD operations
+- **Extensible schema** ready for your models
 
 ### Adding New Packages
 
@@ -100,18 +121,20 @@ import { createApiResponse } from "@fastify-react-router-starter/shared-utils";
 2. Set up `tsconfig.json` with proper `baseUrl: "../../"`
 3. Add build/dev scripts to `package.json`
 4. Apps automatically get access to `@fastify-react-router-starter/*` imports
+5. **Database access**: Just import `@fastify-react-router-starter/database`
 
 ## Demo Integration
 
-The template includes a working demo that shows:
+The template includes a working **Todo application** that demonstrates:
 
-- API ↔ Frontend communication
-- Shared utilities across packages
-- Type safety end-to-end
-- Development workflow with hot reload
-- Build and production deployment
+- **Database Integration**: Prisma ORM with SQLite
+- **API ↔ Frontend Communication**: RESTful CRUD endpoints
+- **Shared Packages**: Types and utilities across monorepo
+- **Type Safety**: End-to-end TypeScript integration
+- **Form Actions**: React Router 7 server-side form handling
+- **Real-time Updates**: Optimistic UI with proper error handling
 
-Visit the web app to see the API integration in action with proper error handling and loading states.
+Visit the web app to create, toggle, and delete todos with full persistence to SQLite.
 
 ## Deployment Ready
 
@@ -128,8 +151,15 @@ This template is designed for deployment on:
 | ------------ | ------------------------- | -------------------------------- |
 | **API**      | Fastify + TypeScript      | High-performance backend         |
 | **Frontend** | React Router 7 + Tailwind | Modern SSR React app             |
+| **Database** | Prisma + SQLite           | Type-safe ORM with zero config   |
 | **Build**    | Turborepo + pnpm          | Monorepo orchestration           |
 | **Quality**  | Biome + TypeScript        | Linting, formatting, type safety |
 | **DevX**     | tsx + Vite                | Hot reload and fast builds       |
+
+## Coming Soon
+
+🚀 **CLI Generator**: `npx create-fastify-react-router my-app`
+
+We're building a CLI tool to generate this template with customizable options. See [DEVELOPMENT.md](./DEVELOPMENT.md) for progress updates.
 
 ---
