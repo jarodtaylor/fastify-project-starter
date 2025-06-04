@@ -474,6 +474,111 @@ export interface ProjectOptions {
 - **Files**: kebab-case for file names
 - **Commits**: Conventional commits (feat:, fix:, docs:, etc.)
 
+## 🤖 CI/CD and Automated Checks
+
+### Pull Request Checks
+
+Every PR automatically runs these checks:
+
+**🔍 Pre-commit Checks**:
+
+- Code formatting (Biome)
+- Linting (TypeScript + Biome)
+- Type checking (main project + CLI)
+- Security scanning (no secrets, large files)
+
+**🏗️ Template Validation**:
+
+- TypeScript compilation
+- Build process
+- Database setup
+- Runtime functionality (API + Web endpoints)
+
+**🛠️ CLI Validation**:
+
+- CLI builds successfully
+- Template structure is correct
+- CLI help/version commands work
+
+**🚀 CLI Generation Testing**:
+
+- Multiple test scenarios (default, no-install, postgres, eslint)
+- Project structure validation
+- Variable replacement verification
+- Generated project compilation and build
+
+**🎯 End-to-End Testing**:
+
+- Full project generation with dependency installation
+- Database setup and API functionality
+- Runtime validation with real HTTP requests
+
+**🔒 Security Checks**:
+
+- Dependency vulnerability scanning
+- Package audit (moderate+ severity issues fail)
+
+**📚 Documentation Validation**:
+
+- Link checking
+- Documentation structure verification
+- Version consistency checks
+
+### Local Testing Commands
+
+Run the same checks locally before pushing:
+
+```bash
+# Quick pre-commit checks
+pnpm format:check && pnpm lint && pnpm typecheck
+
+# Full template validation
+pnpm build && pnpm dev  # Test in another terminal
+
+# CLI validation
+cd cli && pnpm build && node dist/index.js test-local --no-install --no-git
+
+# Security checks
+pnpm audit && cd cli && pnpm audit
+```
+
+### Continuous Monitoring
+
+**📊 Scheduled Checks**:
+
+- **Daily**: Published CLI testing across Node.js versions
+- **Weekly**: Dependency update notifications
+
+**🚨 Failure Handling**:
+
+- PRs are blocked if any required check fails
+- Security issues trigger immediate notifications
+- Published CLI failures create warning issues
+
+### Adding New Checks
+
+To add new CI checks:
+
+1. **Update workflow files** in `.github/workflows/`
+2. **Add corresponding package.json scripts** if needed
+3. **Document in CONTRIBUTING.md**
+4. **Test locally first** to avoid CI failures
+
+**Example**: Adding a new test suite:
+
+```yaml
+# In .github/workflows/ci.yml
+- name: 🧪 New Test Suite
+  run: pnpm test:new-feature
+```
+
+```json
+// In package.json
+"scripts": {
+  "test:new-feature": "vitest run new-feature"
+}
+```
+
 ## 🤝 Getting Help
 
 - **Questions**: Open a [Discussion](https://github.com/jarodtaylor/fastify-react-router-starter/discussions)

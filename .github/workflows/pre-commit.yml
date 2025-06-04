@@ -1,0 +1,52 @@
+name: Pre-commit Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pre-commit:
+    name: 🔍 Pre-commit Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Check for common issues
+        run: |
+          # Check for large files
+          find . -type f -size +10M -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./cli/template/*" && echo "Large files found!" && exit 1 || true
+
+          # Check for secrets/sensitive data
+          grep -r "password\|secret\|key\|token" --include="*.ts" --include="*.js" --include="*.json" --exclude-dir=node_modules --exclude-dir=.git . && echo "Potential secrets found!" && exit 1 || true
+
+          # Check for console.log statements in production files
+          grep -r "console\.log" apps/ packages/ --include="*.ts" --include="*.tsx" && echo "Console.log statements found!" && exit 1 || true
+
+      - name: 🎨 Check formatting
+        run: pnpm format:check
+
+      - name: 🔍 Lint check
+        run: pnpm lint
+
+      - name: 🔍 Type check
+        run: pnpm typecheck
+
+      - name: 🔍 CLI type check
+        run: cd cli && pnpm typecheck

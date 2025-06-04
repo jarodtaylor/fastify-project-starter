@@ -44,6 +44,7 @@
     "start": "turbo run start",
     "lint": "turbo lint",
     "format": "biome format . --write",
+    "format:check": "biome format . --check",
     "typecheck": "turbo typecheck",
     "test": "turbo run test",
     "audit": "pnpm audit",
@@ -51,6 +52,7 @@
     "precheck": "pnpm lint && pnpm format && pnpm check && pnpm test && pnpm audit",
     "db:generate": "cd packages/database && pnpm db:generate",
     "db:push": "cd packages/database && pnpm db:push",
+    "db:reset": "cd packages/database && pnpm db:reset",
     "db:studio": "cd packages/database && pnpm db:studio",
     "db:migrate": "cd packages/database && pnpm db:migrate",
     "clean": "turbo clean"
