@@ -102,6 +102,8 @@ export async function replaceTemplateVars(
 	// Handle database-specific configurations
 	if (options.db !== "sqlite") {
 		await updateDatabaseConfig(projectPath, options.db);
+		await updatePrismaSchema(projectPath, options.db);
+		await updateDatabaseDependencies(projectPath, options.db);
 	}
 
 	// Handle ORM-specific configurations
@@ -114,26 +116,113 @@ async function updateDatabaseConfig(
 	projectPath: string,
 	dbType: "postgres" | "mysql",
 ): Promise<void> {
+	// Update root .env.example
 	const envPath = join(projectPath, ".env.example");
+	await updateEnvFile(envPath, dbType);
 
+	// Update database package .env.example
+	const dbEnvPath = join(projectPath, "packages", "database", ".env.example");
+	await updateEnvFile(dbEnvPath, dbType);
+}
+
+async function updateEnvFile(
+	envPath: string,
+	dbType: "postgres" | "mysql",
+): Promise<void> {
 	try {
 		let envContent = await readFile(envPath, "utf-8");
 
 		if (dbType === "postgres") {
 			envContent = envContent.replace(
-				'DATABASE_URL="file:./data/dev.db"',
+				'DATABASE_URL="file:../../data/dev.db"',
 				'DATABASE_URL="postgresql://user:password@localhost:5432/mydb"',
 			);
 		} else if (dbType === "mysql") {
 			envContent = envContent.replace(
-				'DATABASE_URL="file:./data/dev.db"',
+				'DATABASE_URL="file:../../data/dev.db"',
 				'DATABASE_URL="mysql://user:password@localhost:3306/mydb"',
 			);
 		}
 
 		await writeFile(envPath, envContent, "utf-8");
 	} catch (error) {
-		console.warn("Warning: Could not update database configuration");
+		console.warn(`Warning: Could not update ${envPath}`);
+	}
+}
+
+async function updatePrismaSchema(
+	projectPath: string,
+	dbType: "postgres" | "mysql",
+): Promise<void> {
+	const schemaPath = join(
+		projectPath,
+		"packages",
+		"database",
+		"prisma",
+		"schema.prisma",
+	);
+
+	try {
+		let schemaContent = await readFile(schemaPath, "utf-8");
+
+		// Update the provider
+		if (dbType === "postgres") {
+			schemaContent = schemaContent.replace(
+				'provider = "sqlite"',
+				'provider = "postgresql"',
+			);
+		} else if (dbType === "mysql") {
+			schemaContent = schemaContent.replace(
+				'provider = "sqlite"',
+				'provider = "mysql"',
+			);
+		}
+
+		await writeFile(schemaPath, schemaContent, "utf-8");
+	} catch (error) {
+		console.warn("Warning: Could not update Prisma schema");
+	}
+}
+
+async function updateDatabaseDependencies(
+	projectPath: string,
+	dbType: "postgres" | "mysql",
+): Promise<void> {
+	const packageJsonPath = join(
+		projectPath,
+		"packages",
+		"database",
+		"package.json",
+	);
+
+	try {
+		const packageContent = await readFile(packageJsonPath, "utf-8");
+		const packageJson = JSON.parse(packageContent);
+
+		// Add appropriate database driver
+		if (dbType === "postgres") {
+			packageJson.dependencies = {
+				...packageJson.dependencies,
+				pg: "^8.11.3",
+			};
+			packageJson.devDependencies = {
+				...packageJson.devDependencies,
+				"@types/pg": "^8.10.9",
+			};
+		} else if (dbType === "mysql") {
+			packageJson.dependencies = {
+				...packageJson.dependencies,
+				mysql2: "^3.6.5",
+			};
+		}
+
+		await writeFile(
+			packageJsonPath,
+			JSON.stringify(packageJson, null, "\t"),
+			"utf-8",
+		);
+	} catch (error) {
+		console.warn("Warning: Could not update database package.json");
 	}
 }
 
