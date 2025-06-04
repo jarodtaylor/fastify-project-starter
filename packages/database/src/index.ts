@@ -29,3 +29,4 @@ export const toggleTodo = (id: string) =>
     data: { completed: { not: true } },
   });
 export const deleteTodo = (id: string) => prisma.todo.delete({ where: { id } });
+ 

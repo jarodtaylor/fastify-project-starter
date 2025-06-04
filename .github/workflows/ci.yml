@@ -24,7 +24,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -73,7 +73,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -126,7 +126,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -200,7 +200,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -211,7 +211,7 @@ jobs:
       - name: 🏗️ Build CLI
         run: cd cli && pnpm build
 
-      - name: 🚀 Generate full test project
+      - name: Generate full test project
         run: |
           cd /tmp
           node $GITHUB_WORKSPACE/cli/dist/index.js e2e-test --no-git
@@ -255,7 +255,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
