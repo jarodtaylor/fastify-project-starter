@@ -18,6 +18,9 @@ out
 # React Router generated files
 .react-router/
 
+# Database
+data/
+
 # IDEs
 .vscode
 .idea
