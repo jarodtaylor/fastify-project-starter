@@ -231,22 +231,56 @@ jobs:
           pnpm db:push
 
           # Start the development servers in background
-          timeout 45s pnpm dev &
-          sleep 25
+          pnpm dev &
+          DEV_PID=$!
+
+          # Wait for API server to be ready (max 60 seconds)
+          echo "Waiting for API server to start..."
+          for i in {1..60}; do
+            if curl -s http://localhost:3000/api/todos > /dev/null 2>&1; then
+              echo "API server is ready!"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "API server failed to start within 60 seconds"
+              kill $DEV_PID 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
+
+          # Wait for web server to be ready (max 30 seconds)
+          echo "Waiting for web server to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:5173 > /dev/null 2>&1; then
+              echo "Web server is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Web server failed to start within 30 seconds"
+              kill $DEV_PID 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
 
           # Test API endpoints
-          curl -f http://localhost:3000/api/todos || exit 1
+          echo "Testing API endpoints..."
+          curl -f http://localhost:3000/api/todos || { kill $DEV_PID 2>/dev/null || true; exit 1; }
 
           # Test API POST (create todo)
           curl -f -X POST http://localhost:3000/api/todos \
             -H "Content-Type: application/json" \
-            -d '{"title":"Test Todo","completed":false}' || exit 1
+            -d '{"title":"Test Todo","completed":false}' || { kill $DEV_PID 2>/dev/null || true; exit 1; }
 
           # Test Web app loads
-          curl -f http://localhost:5173 || exit 1
+          curl -f http://localhost:5173 || { kill $DEV_PID 2>/dev/null || true; exit 1; }
+
+          echo "All tests passed!"
 
           # Cleanup
-          pkill -f "pnpm dev" || true
+          kill $DEV_PID 2>/dev/null || true
+          wait $DEV_PID 2>/dev/null || true
 
   # Security and dependency checks
   security-check:
