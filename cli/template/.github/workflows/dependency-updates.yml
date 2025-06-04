@@ -1,0 +1,41 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check-dependencies:
+    name: 🔍 Check Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Check for outdated dependencies (main project)
+        run: pnpm outdated || true
+
+      - name: 🔍 Check for outdated dependencies (CLI)
+        run: cd cli && pnpm outdated || true
+
+      - name: 🔒 Security audit (main project)
+        run: pnpm audit --audit-level high
+
+      - name: 🔒 Security audit (CLI)
+        run: cd cli && pnpm audit --audit-level high
