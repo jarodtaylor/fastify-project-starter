@@ -1,17 +1,17 @@
-# 🚀 Fullstack Monorepo Template
+# Fullstack Monorepo Template
 
 A modern, production-ready monorepo template for building fullstack applications with **Fastify APIs** and **React Router 7** frontends.
 
-## ✨ Features
+## Features
 
-- 🏗️ **Monorepo Architecture**: Managed by pnpm workspaces + Turborepo
-- ⚡ **Fast Backend**: Fastify with TypeScript and hot reload
-- 🎨 **Modern Frontend**: React Router 7 with SSR and Tailwind CSS
-- 🔧 **Developer Experience**: Biome for linting/formatting, shared TypeScript configs
-- 📦 **Package Management**: Clean `@` imports with path mapping
-- 🚦 **Quality Gates**: Pre-commit checks for formatting, linting, type safety, and tests
+- **Monorepo**: Usiong [pnpm workspaces](https://pnpm.io/workspaces) + [Turborepo](https://turborepo.com/docs)
+- **API Backend**: [Fastify](https://fastify.dev/) with TypeScript and hot reload
+- **Frontend**: [React Router 7](https://reactrouter.com/home) with SSR and [Tailwind 4](https://tailwindcss.com/docs)
+- **Developer Experience**: [Biome](https://biomejs.dev/) for formatting and linting
+- **Package Management**: Clean `@` imports with path mapping
+- **Quality Gates**: Pre-commit checks for formatting, linting, type safety, and tests
 
-## 📁 Structure
+## Structure
 
 ```
 ├── apps/
@@ -25,7 +25,7 @@ A modern, production-ready monorepo template for building fullstack applications
 └── pnpm-workspace.yaml     # Workspace configuration
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -77,25 +77,15 @@ pnpm test        # Run tests
 pnpm audit       # Security audit
 ```
 
-## 🛠️ Key Configuration Notes
+## Key Configuration Notes
 
 ### TypeScript Path Mapping
 
-**✅ Works for code imports:**
+**Works for code imports:**
 
 ```typescript
 import { createApiResponse } from "@localpro/shared-utils";
 ```
-
-**❌ Limitation for tsconfig extends:**
-
-```json
-{
-  "extends": "../../packages/typescript-config/base.json" // Must use relative paths
-}
-```
-
-This is because TypeScript's `extends` field has limited module resolution compared to regular imports.
 
 ### Adding New Packages
 
@@ -111,19 +101,19 @@ This is because TypeScript's `extends` field has limited module resolution compa
 3. Add build/dev scripts to `package.json`
 4. Apps automatically get access to `@localpro/*` imports
 
-## 🎯 Demo Integration
+## Demo Integration
 
 The template includes a working demo that shows:
 
-- ✅ API ↔ Frontend communication
-- ✅ Shared utilities across packages
-- ✅ Type safety end-to-end
-- ✅ Development workflow with hot reload
-- ✅ Build and production deployment
+- API ↔ Frontend communication
+- Shared utilities across packages
+- Type safety end-to-end
+- Development workflow with hot reload
+- Build and production deployment
 
 Visit the web app to see the API integration in action with proper error handling and loading states.
 
-## 🚢 Deployment Ready
+## Deployment Ready
 
 This template is designed for deployment on:
 
@@ -132,7 +122,7 @@ This template is designed for deployment on:
 - **Railway/Fly.io**: Containerized full-stack deployment
 - **AWS/GCP/Azure**: Traditional cloud deployment
 
-## 📚 Tech Stack
+## Tech Stack
 
 | Layer        | Technology                | Purpose                          |
 | ------------ | ------------------------- | -------------------------------- |
@@ -143,5 +133,3 @@ This template is designed for deployment on:
 | **DevX**     | tsx + Vite                | Hot reload and fast builds       |
 
 ---
-
-**Happy coding!** 🎉
