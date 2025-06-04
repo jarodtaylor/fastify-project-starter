@@ -1,56 +1,57 @@
 {
-  "name": "fastify-react-router-starter",
-  "version": "1.0.0",
-  "description": "A monorepo template for building fullstack applications with Fastify APIs and React Router 7 frontends",
-  "keywords": [
-    "fastify",
-    "react-router",
-    "monorepo",
-    "typescript",
-    "turborepo",
-    "pnpm",
-    "biome",
-    "tailwind",
-    "fullstack",
-    "starter",
-    "template"
-  ],
-  "homepage": "https://github.com/jarodtaylor/fastify-react-router-starter#readme",
-  "bugs": {
-    "url": "https://github.com/jarodtaylor/fastify-react-router-starter/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jarodtaylor/fastify-react-router-starter.git"
-  },
-  "license": "MIT",
-  "author": {
-    "name": "Jarod Taylor",
-    "url": "https://github.com/jarodtaylor"
-  },
-  "type": "module",
-  "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "packageManager": "pnpm@10.11.1",
-  "scripts": {
-    "dev": "turbo run dev",
-    "dev:api": "turbo run dev --filter=api",
-    "dev:web": "turbo run dev --filter=web",
-    "build": "turbo run build",
-    "start": "turbo run start",
-    "lint": "biome lint .",
-    "format": "biome format . --write",
-    "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
-    "audit": "pnpm audit",
-    "check": "biome check . && pnpm typecheck",
-    "precheck": "pnpm lint && pnpm format && pnpm check && pnpm test && pnpm audit"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "turbo": "^2.5.4",
-    "typescript": "^5.8.3"
-  }
+	"name": "fastify-react-router-starter",
+	"version": "1.0.0",
+	"description": "A monorepo template for building fullstack applications with Fastify APIs and React Router 7 frontends",
+	"keywords": [
+		"fastify",
+		"react-router",
+		"monorepo",
+		"typescript",
+		"turborepo",
+		"pnpm",
+		"biome",
+		"tailwind",
+		"fullstack",
+		"starter",
+		"boilerplate",
+		"template"
+	],
+	"homepage": "https://github.com/jarodtaylor/fastify-react-router-starter#readme",
+	"bugs": {
+		"url": "https://github.com/jarodtaylor/fastify-react-router-starter/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jarodtaylor/fastify-react-router-starter.git"
+	},
+	"license": "MIT",
+	"author": {
+		"name": "Jarod Taylor",
+		"url": "https://github.com/jarodtaylor"
+	},
+	"type": "module",
+	"engines": {
+		"node": ">=18.0.0",
+		"pnpm": ">=8.0.0"
+	},
+	"packageManager": "pnpm@10.11.1",
+	"scripts": {
+		"dev": "turbo run dev",
+		"dev:api": "turbo run dev --filter=api",
+		"dev:web": "turbo run dev --filter=web",
+		"build": "turbo run build",
+		"start": "turbo run start",
+		"lint": "biome lint .",
+		"format": "biome format . --write",
+		"typecheck": "turbo run typecheck",
+		"test": "turbo run test",
+		"audit": "pnpm audit",
+		"check": "biome check . && pnpm typecheck",
+		"precheck": "pnpm lint && pnpm format && pnpm check && pnpm test && pnpm audit"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"turbo": "^2.5.4",
+		"typescript": "^5.8.3"
+	}
 }

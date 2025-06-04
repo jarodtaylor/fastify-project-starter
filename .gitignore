@@ -13,8 +13,10 @@ out
 .cache
 
 # Turborepo
-turbo
-.turbo
+.turbo/
+
+# React Router generated files
+.react-router/
 
 # IDEs
 .vscode
