@@ -14,7 +14,7 @@ pnpm dev
 
 **That's it!** You'll have a complete fullstack application running:
 
-- 🚀 **API Server**: http://localhost:3001
+- 🚀 **API Server**: http://localhost:3000
 - 🌐 **Frontend**: http://localhost:5173
 - 🗄️ **Database**: SQLite with sample data
 
@@ -323,10 +323,10 @@ pnpm typecheck
 **❓ Port conflicts**
 
 ```bash
-# API runs on :3001, Web on :5173
+# API runs on :3000, Web on :5173
 # Kill existing processes:
-lsof -ti:3001 | xargs kill
-lsof -ti:5173 | xargs kill
+curl http://localhost:3000/api/todos
+lsof -ti:3000 | xargs kill
 ```
 
 ### Getting Help

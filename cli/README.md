@@ -59,7 +59,7 @@ Your project will be created with this structure:
 ```
 my-app/
 ├── apps/
-│   ├── api/          # Fastify API server (localhost:3001)
+│   ├── api/          # Fastify API server (localhost:3000)
 │   └── web/          # React Router 7 app (localhost:5173)
 ├── packages/
 │   ├── database/     # Shared Prisma database
@@ -92,7 +92,7 @@ my-app/
 
 4. **Open your app**:
    - Frontend: http://localhost:5173
-   - API: http://localhost:3001
+   - API: http://localhost:3000
    - Database Studio: `pnpm db:studio`
 
 ## Database Options
