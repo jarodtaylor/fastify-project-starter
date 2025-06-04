@@ -1,4 +1,4 @@
-# Fullstack Monorepo Template
+# Fastify React-Router Starter
 
 A modern, production-ready monorepo template for building fullstack applications with **Fastify APIs** and **React Router 7** frontends.
 
