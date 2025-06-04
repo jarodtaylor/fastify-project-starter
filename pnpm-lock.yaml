@@ -23,6 +23,9 @@ importers:
       '@fastify-react-router-starter/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@fastify-react-router-starter/shared-utils':
+        specifier: workspace:*
+        version: link:../../packages/shared-utils
       '@fastify/cors':
         specifier: ^10.0.1
         version: 10.1.0

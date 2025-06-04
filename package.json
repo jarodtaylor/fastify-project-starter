@@ -55,7 +55,10 @@
 		"db:reset": "cd packages/database && pnpm db:reset",
 		"db:studio": "cd packages/database && pnpm db:studio",
 		"db:migrate": "cd packages/database && pnpm db:migrate",
-		"clean": "turbo clean"
+		"clean": "turbo clean",
+		"test:cli": "./scripts/test-cli-local.sh",
+		"test:template": "pnpm typecheck && pnpm build && pnpm format:check",
+		"validate": "pnpm test:template && pnpm test:cli"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",

@@ -7,6 +7,7 @@ const EXCLUDE_PATTERNS = [
 	"node_modules",
 	".git",
 	"cli",
+	"scripts",
 	".turbo",
 	"dist",
 	"build",

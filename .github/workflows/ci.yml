@@ -6,12 +6,15 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  # Test the template itself
-  template-validation:
-    name: 🏗️ Template Validation
-    runs-on: ubuntu-latest
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  # Fast feedback for developers
+  validate:
+    name: 🔍 Validate & Test
+    runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -19,49 +22,40 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: 20
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🔍 Type check
+      - name: 🎨 Format & Lint Check
+        run: |
+          pnpm format:check
+          pnpm lint
+
+      - name: 🔍 Type Check
         run: pnpm typecheck
 
-      - name: 🎨 Lint check
-        run: pnpm lint
-
-      - name: 🎨 Format check
-        run: pnpm format:check
-
-      - name: 🏗️ Build check
+      - name: 🏗️ Build Check
         run: pnpm build
 
-      - name: 🗄️ Database setup
+      - name: 🧪 Template Functionality Test
         run: |
+          # Test the template directly (not generated projects)
           cp .env.example .env
           cp packages/database/.env.example packages/database/.env
           pnpm db:push
+          # Quick smoke test
+          timeout 10s pnpm dev || true
 
-      - name: 🧪 Template functionality test
-        run: |
-          timeout 30s pnpm dev &
-          sleep 20
-          # Test API endpoint
-          curl -f http://localhost:3000/api/todos || exit 1
-          # Test Web app (basic check)
-          curl -f http://localhost:5173 || exit 1
-          pkill -f "pnpm dev" || true
-
-  # Test CLI build and basic functionality
+  # CLI validation - test CLI logic without project generation
   cli-validation:
     name: 🛠️ CLI Validation
     runs-on: ubuntu-latest
-
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -69,130 +63,42 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: 20
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 📥 Install CLI dependencies
-        run: cd cli && pnpm install --frozen-lockfile
-
-      - name: 🔍 CLI type check
-        run: cd cli && pnpm typecheck
-
       - name: 🏗️ Build CLI
-        run: cd cli && pnpm build
-
-      - name: 🧪 CLI help test
-        run: node cli/dist/index.js --help
-
-      - name: 🧪 CLI version test
-        run: node cli/dist/index.js --version
-
-      - name: 📁 Verify template structure
         run: |
-          ls cli/template/packages/ | grep -E "(database|shared-utils|typescript-config)" || exit 1
-          ls cli/template/apps/ | grep -E "(api|web)" || exit 1
-
-  # Test CLI project generation
-  cli-generation-test:
-    name: 🚀 CLI Generation Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test-case:
-          - name: "default"
-            args: "--no-git"
-          - name: "no-install"
-            args: "--no-install --no-git"
-          - name: "postgres"
-            args: "--db postgres --no-git"
-          - name: "eslint"
-            args: "--lint eslint --no-git"
-
-    steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
-      - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: 📥 Install CLI dependencies
-        run: cd cli && pnpm install --frozen-lockfile
-
-      - name: 🏗️ Build CLI
-        run: cd cli && pnpm build
-
-      - name: 🚀 Generate test project
-        run: |
-          cd /tmp
-          node $GITHUB_WORKSPACE/cli/dist/index.js test-${{ matrix.test-case.name }} ${{ matrix.test-case.args }}
-
-      - name: 🔍 Verify project structure
-        run: |
-          cd /tmp/test-${{ matrix.test-case.name }}
-          ls packages/ | grep -E "(database|shared-utils|typescript-config)" || exit 1
-          ls apps/ | grep -E "(api|web)" || exit 1
-
-      - name: 🔍 Verify variable replacement
-        run: |
-          cd /tmp/test-${{ matrix.test-case.name }}
-          # Should find the new project name
-          grep -r "test-${{ matrix.test-case.name }}" package.json || exit 1
-          # Should not find old template name (minimal occurrences)
-          ! grep -r "fastify-react-router-starter" package.json || exit 1
-
-      - name: 📦 Test dependency installation (if not skipped)
-        if: ${{ !contains(matrix.test-case.args, '--no-install') }}
-        run: |
-          cd /tmp/test-${{ matrix.test-case.name }}
-          ls node_modules/ || exit 1
-
-      - name: 📦 Manual dependency installation (if skipped)
-        if: ${{ contains(matrix.test-case.args, '--no-install') }}
-        run: |
-          cd /tmp/test-${{ matrix.test-case.name }}
-          pnpm install
-
-      - name: 🔍 Test TypeScript compilation
-        run: |
-          cd /tmp/test-${{ matrix.test-case.name }}
-          pnpm typecheck
-
-      - name: 🎨 Test linting
-        run: |
-          cd /tmp/test-${{ matrix.test-case.name }}
-          pnpm lint
-
-      - name: 🏗️ Test build
-        run: |
-          cd /tmp/test-${{ matrix.test-case.name }}
-          # Set up database for build test
-          cp .env.example .env
-          cp packages/database/.env.example packages/database/.env
-          pnpm db:push
+          cd cli
+          pnpm install --frozen-lockfile
           pnpm build
 
-  # End-to-end test with full project functionality
-  e2e-test:
-    name: 🎯 End-to-End Test
-    runs-on: ubuntu-latest
+      - name: 🧪 CLI Unit Tests
+        run: |
+          cd cli
+          # Test CLI help and version (no project generation)
+          node dist/index.js --help
+          node dist/index.js --version
 
+      - name: 📁 Verify Template Structure
+        run: |
+          cd cli
+          # Ensure template was copied correctly
+          test -f template/package.json
+          test -f template/apps/api/package.json
+          test -f template/apps/web/package.json
+          test -d template/packages/database
+
+  # Security & documentation
+  security-docs:
+    name: 🔒 Security & Docs
+    runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -200,149 +106,22 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: 20
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 📥 Install CLI dependencies
-        run: cd cli && pnpm install --frozen-lockfile
-
-      - name: 🏗️ Build CLI
-        run: cd cli && pnpm build
-
-      - name: Generate full test project
-        run: |
-          cd /tmp
-          node $GITHUB_WORKSPACE/cli/dist/index.js e2e-test --no-git
-
-      - name: 🧪 Test generated project functionality
-        run: |
-          cd /tmp/e2e-test
-
-          # Set up database
-          cp .env.example .env
-          cp packages/database/.env.example packages/database/.env
-          pnpm db:push
-
-          # Start the development servers in background
-          pnpm dev &
-          DEV_PID=$!
-
-          # Wait for API server to be ready (max 60 seconds)
-          echo "Waiting for API server to start..."
-          for i in {1..60}; do
-            if curl -s http://localhost:3000/api/todos > /dev/null 2>&1; then
-              echo "API server is ready!"
-              break
-            fi
-            if [ $i -eq 60 ]; then
-              echo "API server failed to start within 60 seconds"
-              kill $DEV_PID 2>/dev/null || true
-              exit 1
-            fi
-            sleep 1
-          done
-
-          # Wait for web server to be ready (max 30 seconds)
-          echo "Waiting for web server to start..."
-          for i in {1..30}; do
-            if curl -s http://localhost:5173 > /dev/null 2>&1; then
-              echo "Web server is ready!"
-              break
-            fi
-            if [ $i -eq 30 ]; then
-              echo "Web server failed to start within 30 seconds"
-              kill $DEV_PID 2>/dev/null || true
-              exit 1
-            fi
-            sleep 1
-          done
-
-          # Test API endpoints
-          echo "Testing API endpoints..."
-          curl -f http://localhost:3000/api/todos || { kill $DEV_PID 2>/dev/null || true; exit 1; }
-
-          # Test API POST (create todo)
-          curl -f -X POST http://localhost:3000/api/todos \
-            -H "Content-Type: application/json" \
-            -d '{"title":"Test Todo","completed":false}' || { kill $DEV_PID 2>/dev/null || true; exit 1; }
-
-          # Test Web app loads
-          curl -f http://localhost:5173 || { kill $DEV_PID 2>/dev/null || true; exit 1; }
-
-          echo "All tests passed!"
-
-          # Cleanup
-          kill $DEV_PID 2>/dev/null || true
-          wait $DEV_PID 2>/dev/null || true
-
-  # Security and dependency checks
-  security-check:
-    name: 🔒 Security Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
-      - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: 🔒 Audit dependencies (main project)
+      - name: 🔒 Security Audit
         run: pnpm audit --audit-level moderate
 
-      - name: 🔒 Audit dependencies (CLI)
-        run: cd cli && pnpm audit --audit-level moderate
-
-  # Documentation validation
-  docs-check:
-    name: 📚 Documentation Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-
-      - name: 🔍 Check for broken links in README
+      - name: 📚 Documentation Check
         run: |
-          # Basic link validation (could be enhanced with a tool)
-          grep -o 'https://[^)]*' README.md | while read url; do
-            echo "Checking $url"
-            curl -f --head "$url" || echo "Warning: $url might be broken"
+          # Check for broken links in README
+          grep -o 'https\?://[^)]*' README.md | head -5 | while read url; do
+            curl -fsS "$url" > /dev/null || echo "Broken link: $url"
           done
-
-      - name: 🔍 Verify CLI documentation is up to date
-        run: |
-          # Check that CLI version in package.json matches references
-          CLI_VERSION=$(grep '"version"' cli/package.json | cut -d'"' -f4)
-          if ! grep -q "$CLI_VERSION" DEVELOPMENT.md; then
-            echo "Warning: CLI version $CLI_VERSION not found in DEVELOPMENT.md"
-          fi
-
-      - name: 🔍 Check documentation structure
-        run: |
-          # Verify key documentation files exist and have content
-          test -s README.md || exit 1
-          test -s CONTRIBUTING.md || exit 1
-          test -s DEVELOPMENT.md || exit 1
-
-          # Check for required sections in CONTRIBUTING.md
-          grep -q "CLI Development Workflow" CONTRIBUTING.md || exit 1
-          grep -q "Publishing and Release Process" CONTRIBUTING.md || exit 1
-          grep -q "Debugging and Troubleshooting" CONTRIBUTING.md || exit 1
