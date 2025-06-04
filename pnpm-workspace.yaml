@@ -1,9 +1,10 @@
 packages:
-  - apps/*
-  - packages/*
+- apps/*
+- packages/*
+- cli
 onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - '@prisma/client'
-  - '@prisma/engines'
-  - '@tailwindcss/oxide'
-  - prisma
+- '@biomejs/biome'
+- '@prisma/client'
+- '@prisma/engines'
+- '@tailwindcss/oxide'
+- prisma

@@ -1,110 +1,132 @@
-# Development Progress
+# Development Guide
 
-This document tracks the progress of building the `create-fastify-react-router` CLI generator.
+This document tracks the development progress and architecture decisions for the Fastify + React Router 7 monorepo starter.
+
+> **For Contributors**: See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed development setup, testing procedures, and contribution guidelines.
 
 ## ✅ Completed Features
 
-### Core Template Setup
+### Core Infrastructure
 
-- [x] **Monorepo Structure**: Turborepo + pnpm workspaces
-- [x] **TypeScript Configuration**: Shared configs with path mapping
-- [x] **Fastify API**: Production-ready with hot reload
-- [x] **React Router 7**: Framework mode with SSR support
-- [x] **Biome Integration**: Linting and formatting
-- [x] **Shared Utilities**: Cross-package type-safe utilities
+- [x] **Monorepo Setup**: Turborepo + pnpm workspaces
+- [x] **TypeScript Configuration**: Shared configs across packages
+- [x] **Linting & Formatting**: Biome for consistent code style
+- [x] **Development Tooling**: Hot reload, type checking, parallel builds
 
-### Database Integration
+### Backend (Fastify API)
 
-- [x] **Shared Database Package**: `@workspace/database`
-- [x] **Prisma ORM**: SQLite with full type generation
-- [x] **Todo CRUD API**: Complete REST endpoints
-- [x] **Database Utilities**: Reusable query functions
-- [x] **Extensible Architecture**: Ready for multiple API apps
+- [x] **Fastify Server**: Modern Node.js API framework
+- [x] **Database Integration**: Prisma ORM with SQLite (easily switchable)
+- [x] **Shared Database Package**: Reusable across multiple API apps
+- [x] **CRUD Operations**: Complete Todo API with validation
+- [x] **Error Handling**: Consistent error responses
+- [x] **Environment Configuration**: Proper env var management
 
-### Full-Stack Demo
+### Frontend (React Router 7)
 
+- [x] **React Router 7**: Latest routing with SSR support
+- [x] **Tailwind CSS**: Modern styling with responsive design
+- [x] **Form Handling**: Server-side form actions
+- [x] **Optimistic UI**: Immediate feedback with error handling
 - [x] **Todo Application**: Complete CRUD interface
-- [x] **Form Actions**: React Router 7 server actions
-- [x] **Error Handling**: Comprehensive API error responses
-- [x] **UI/UX**: Modern Tailwind CSS interface
-- [x] **Type Safety**: End-to-end TypeScript integration
 
-### Development Experience
+### CLI Generator ✨
 
-- [x] **Build System**: Turborepo orchestration
-- [x] **Hot Reload**: Both API and frontend
-- [x] **Linting**: Biome with generated file exclusion
-- [x] **Git Hygiene**: Proper gitignore and file structure
+- [x] **CLI Package**: `create-fastify-react-router` generator
+- [x] **Template System**: Uses main project as living template
+- [x] **Variable Replacement**: Customizes package names and scopes
+- [x] **Interactive Options**: Database, ORM, linting choices
+- [x] **Project Initialization**: Dependencies, git, database setup
+- [x] **Comprehensive Documentation**: Usage examples and development guide
 
-## 🚧 In Progress
+## 🚀 CLI Usage
 
-- [ ] **CLI Generator**: `create-fastify-react-router` package
+The project now includes a fully functional CLI generator:
 
-## 📋 Remaining Tasks
+```bash
+# Create a new project
+npx create-fastify-react-router my-app
 
-### CLI Generator Core
+# With options
+npx create-fastify-react-router my-app --db postgres --lint eslint
+```
 
-- [ ] **Project Structure**: Set up CLI package in `/cli`
-- [ ] **Template Engine**: EJS or similar for file generation
-- [ ] **Interactive Prompts**: Project name, options, etc.
-- [ ] **File Templating**: Replace package names/scopes
-- [ ] **Dependency Installation**: Auto-run pnpm install
+## 📋 Next Steps
 
-### Configuration Options
+### CLI Enhancements
 
-- [ ] **Project Name**: Custom project and package scoping
-- [ ] **Database Choice**: SQLite (default), PostgreSQL, MySQL
-- [ ] **ORM Option**: Prisma (default) or `--no-orm`
-- [ ] **Linting**: Biome (default) or `--eslint-prettier`
+- [ ] **Interactive Prompts**: Full inquirer.js integration for better UX
+- [ ] **Template Variants**: Multiple starter templates (minimal, full-featured, etc.)
+- [ ] **Package Manager Choice**: Support for npm, yarn, bun
+- [ ] **Deployment Options**: Vercel, Railway, Docker configurations
+- [ ] **Testing Setup**: Jest/Vitest configuration options
 
-### Template Features
+### Template Improvements
 
-- [ ] **Environment Setup**: Auto-create .env from .env.example
-- [ ] **Database Initialization**: Auto-run Prisma generate/push
-- [ ] **Git Initialization**: Optional git init + initial commit
-- [ ] **README Generation**: Project-specific documentation
+- [ ] **Authentication**: Auth package with multiple providers
+- [ ] **API Documentation**: OpenAPI/Swagger integration
+- [ ] **Testing Examples**: Unit, integration, and E2E test examples
+- [ ] **CI/CD Templates**: GitHub Actions, GitLab CI configurations
+- [ ] **Monitoring**: Logging, metrics, and error tracking setup
 
-### Quality & Publishing
+### Publishing
 
-- [ ] **CLI Testing**: Test generation in various scenarios
-- [ ] **Package Publishing**: NPM package for `npx` usage
-- [ ] **Documentation**: Usage guide and examples
-- [ ] **CI/CD**: Automated testing and publishing
+- [ ] **NPM Publishing**: Publish CLI to npm registry
+- [ ] **GitHub Release**: Automated releases with changelog
+- [ ] **Documentation Site**: Comprehensive docs with examples
+- [ ] **Video Tutorials**: Getting started and advanced usage
 
-### Examples & Extensions
+## 🏗️ Architecture Decisions
 
-- [ ] **Deployment Examples**: Vercel, Railway, Cloudflare
-- [ ] **Auth Examples**: JWT, OAuth, session patterns
-- [ ] **UI Examples**: shadcn/ui, DaisyUI integration
-- [ ] **Multi-API Examples**: Microservices architecture
+### Database Package Strategy
 
-## 🎯 Current Focus
+**Decision**: Create a shared `packages/database` instead of per-app databases.
+**Rationale**: Enables multiple API apps to share the same database schema while maintaining clean separation. Easy to split later if needed.
 
-**Building the CLI Generator** - The template is complete and working. Next step is to create the CLI tool that can generate this template with customizable options.
+### Template Approach
 
-## 🔧 Technical Decisions Made
+**Decision**: Use the main project as the template source.
+**Rationale**: Ensures the template is always up-to-date and functional. No need to maintain separate template files.
 
-### Database Strategy
+### CLI Implementation
 
-- **Shared Package**: Single `@workspace/database` for all APIs
-- **SQLite Default**: Zero-config setup, easy to migrate later
-- **Prisma ORM**: De facto standard with excellent TypeScript support
+**Decision**: Build CLI as a separate package within the monorepo.
+**Rationale**: Keeps CLI code organized while allowing it to use the main project as a template. Easy to test and develop.
 
-### Monorepo Architecture
+## 🧪 Testing the CLI
 
-- **Extensible**: Easy to add new API/frontend apps
-- **Shared Resources**: Database, utilities, configs centralized
-- **Independent Deployment**: Each app can be deployed separately
+```bash
+# Build the CLI
+cd cli && pnpm build
 
-### CLI Generator Approach
+# Test locally
+node dist/index.js test-project --no-install --no-git
 
-- **Template-Based**: Use current repo as template source
-- **Minimal Options**: Opinionated defaults with key customizations
-- **Interactive**: Prompt-driven setup experience
+# Test full flow
+node dist/index.js my-app
+cd my-app && pnpm install && pnpm dev
+```
 
-## 📝 Notes
+## 📦 Package Structure
 
-- Template is production-ready with real database integration
-- Architecture supports both single-app and multi-app scenarios
-- All major monorepo patterns implemented and tested
-- Ready to move to CLI generator phase
+```
+fastify-react-router-starter/
+├── apps/
+│   ├── api/              # Fastify API server
+│   └── web/              # React Router 7 frontend
+├── packages/
+│   ├── database/         # Shared Prisma database
+│   ├── shared-utils/     # Shared utilities
+│   ├── typescript-config/# Shared TypeScript config
+│   └── ui/               # Shared UI components
+├── cli/                  # CLI generator package
+│   ├── src/              # CLI source code
+│   ├── dist/             # Built CLI
+│   └── README.md         # CLI documentation
+├── data/                 # SQLite database files
+├── package.json          # Root package.json
+├── turbo.json            # Turborepo configuration
+└── pnpm-workspace.yaml   # Workspace configuration
+```
+
+This starter is now production-ready and includes everything needed to build modern fullstack applications with a powerful CLI generator for rapid project creation.
