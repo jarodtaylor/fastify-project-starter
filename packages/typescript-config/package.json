@@ -1,5 +1,5 @@
 {
-  "name": "@localpro/typescript-config",
+  "name": "@fastify-react-router-starter/typescript-config",
   "version": "1.0.0",
   "main": "base.json",
   "exports": {

@@ -1,5 +1,8 @@
 import Fastify from "fastify";
-import { createApiResponse, formatApiError } from "@localpro/shared-utils";
+import {
+  createApiResponse,
+  formatApiError,
+} from "@fastify-react-router-starter/shared-utils";
 
 const fastify = Fastify({
   logger: true,

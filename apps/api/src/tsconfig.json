@@ -1,5 +1,5 @@
 {
-  "extends": "@localpro/typescript-config/base.json",
+  "extends": "@fastify-react-router-starter/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist"
   },

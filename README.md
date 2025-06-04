@@ -84,22 +84,22 @@ pnpm audit       # Security audit
 **Works for code imports:**
 
 ```typescript
-import { createApiResponse } from "@localpro/shared-utils";
+import { createApiResponse } from "@fastify-react-router-starter/shared-utils";
 ```
 
 ### Adding New Packages
 
 1. Create the package directory under `packages/`
-2. Add proper `package.json` with `@localpro/*` naming
+2. Add proper `package.json` with `@fastify-react-router-starter/*` naming
 3. Export types/functions you want to share
-4. Import using clean syntax: `@localpro/package-name`
+4. Import using clean syntax: `@fastify-react-router-starter/package-name`
 
 ### Adding New Apps
 
 1. Create the app directory under `apps/`
 2. Set up `tsconfig.json` with proper `baseUrl: "../../"`
 3. Add build/dev scripts to `package.json`
-4. Apps automatically get access to `@localpro/*` imports
+4. Apps automatically get access to `@fastify-react-router-starter/*` imports
 
 ## Demo Integration
 
