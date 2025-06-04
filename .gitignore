@@ -11,7 +11,10 @@ build
 .next
 out
 .cache
+
+# Turborepo
 turbo
+.turbo
 
 # IDEs
 .vscode

@@ -1,9 +1,14 @@
 import type { LoaderFunctionArgs } from "react-router";
+import { useNavigate, useRevalidator } from "react-router";
 
 interface ApiResponse {
-  message: string;
+  data: {
+    message: string;
+    version: string;
+    status?: string;
+  } | null;
+  error: string | null;
   timestamp: string;
-  version: string;
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -45,6 +50,19 @@ export default function Home({
   loaderData: { data: ApiResponse | null; error: string | null };
 }) {
   const { data, error } = loaderData;
+  const navigate = useNavigate();
+  const revalidator = useRevalidator();
+
+  const handleNameClick = (name: string | null) => {
+    const params = new URLSearchParams();
+    if (name) {
+      params.set("name", name);
+    }
+    const newUrl = name ? `?${params.toString()}` : "/";
+    navigate(newUrl);
+    // Force revalidation to ensure loader runs again
+    revalidator.revalidate();
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -99,7 +117,7 @@ export default function Home({
                       Message:
                     </span>
                     <span className="ml-2 text-gray-900 dark:text-white">
-                      {data?.message}
+                      {data?.data?.message}
                     </span>
                   </div>
                   <div>
@@ -107,7 +125,7 @@ export default function Home({
                       Version:
                     </span>
                     <span className="ml-2 text-gray-900 dark:text-white">
-                      {data?.version}
+                      {data?.data?.version}
                     </span>
                   </div>
                   <div>
@@ -128,18 +146,27 @@ export default function Home({
                 Try with a custom name:
               </h4>
               <div className="flex gap-2">
-                <a
-                  href="?name=Developer"
+                <button
+                  type="button"
+                  onClick={() => handleNameClick("Developer")}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                 >
                   Say Hello to Developer
-                </a>
-                <a
-                  href="?name=World"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleNameClick("Coder")}
+                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                >
+                  Say Hello to Coder
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleNameClick(null)}
                   className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
                 >
                   Default
-                </a>
+                </button>
               </div>
             </div>
           </div>
