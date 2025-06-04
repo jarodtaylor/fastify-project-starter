@@ -36,11 +36,7 @@ program
       // Create the project
       await createProject(validatedName, options);
 
-      console.log(chalk.green.bold("\n✨ Project created successfully!"));
-      console.log(chalk.gray("\nNext steps:"));
-      console.log(chalk.cyan(`  cd ${validatedName}`));
-      console.log(chalk.cyan("  pnpm dev"));
-      console.log(chalk.gray("\nHappy coding! 🎉"));
+      // Success/error messaging is now handled in createProject
     } catch (error) {
       console.error(
         chalk.red.bold("❌ Error:"),
