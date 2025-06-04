@@ -123,4 +123,58 @@ export async function createProject(
       spinner.warn("Failed to initialize git repository");
     }
   }
+
+  // Validate project setup
+  spinner.start("Validating project setup...");
+  const hasErrors = await validateProject(projectPath, options);
+
+  if (hasErrors) {
+    spinner.fail("Project created with issues");
+    console.log(
+      chalk.red("\n⚠️  The project was created but has configuration issues:")
+    );
+    console.log(chalk.yellow("1. Run 'pnpm install' to install dependencies"));
+    console.log(chalk.yellow("2. Check the README.md for setup instructions"));
+    console.log(
+      chalk.yellow(
+        "3. If issues persist, please report at: https://github.com/jarodtaylor/fastify-react-router-starter/issues"
+      )
+    );
+  } else {
+    spinner.succeed("Project validated successfully");
+  }
+}
+
+async function validateProject(
+  projectPath: string,
+  options: ProjectOptions
+): Promise<boolean> {
+  let hasErrors = false;
+
+  // Check if dependencies can be resolved
+  if (options.install) {
+    try {
+      await execa("pnpm", ["list"], { cwd: projectPath, stdio: "pipe" });
+    } catch (error) {
+      hasErrors = true;
+    }
+  }
+
+  // Check if required packages exist
+  const requiredPackages = [
+    "packages/shared-utils",
+    "packages/typescript-config",
+  ];
+  if (options.orm === "prisma") {
+    requiredPackages.push("packages/database");
+  }
+
+  for (const pkg of requiredPackages) {
+    if (!existsSync(resolve(projectPath, pkg))) {
+      hasErrors = true;
+      break;
+    }
+  }
+
+  return hasErrors;
 }

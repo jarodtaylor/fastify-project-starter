@@ -11,7 +11,7 @@ const EXCLUDE_PATTERNS = [
   ".git",
   "cli",
   ".turbo",
-  "data",
+  "data/",
   "dist",
   "build",
   ".next",
@@ -26,7 +26,11 @@ function shouldExclude(filename) {
       const regex = new RegExp(pattern.replace(/\*/g, ".*"));
       return regex.test(filename);
     }
-    return filename === pattern || filename.startsWith(pattern);
+    // Exact match for directories ending with / or exact filename match
+    if (pattern.endsWith("/")) {
+      return filename === pattern.slice(0, -1);
+    }
+    return filename === pattern;
   });
 }
 
