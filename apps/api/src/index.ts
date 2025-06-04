@@ -35,7 +35,7 @@ fastify.register(import("@fastify/cors"), {
 
 const start = async () => {
   try {
-    const port = Number(process.env.PORT) || 3001;
+    const port = Number(process.env.PORT) || 3000;
     await fastify.listen({ port, host: "0.0.0.0" });
     console.log(`🚀 API Server ready at http://localhost:${port}`);
   } catch (err) {

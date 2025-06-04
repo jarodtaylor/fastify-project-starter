@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const name = url.searchParams.get("name") || undefined;
 
   try {
-    const apiUrl = new URL("/api/hello", "http://localhost:3001");
+    const apiUrl = new URL("/api/hello", "http://localhost:3000");
     if (name) {
       apiUrl.searchParams.set("name", name);
     }

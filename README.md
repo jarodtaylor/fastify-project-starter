@@ -49,7 +49,7 @@ pnpm approve-builds
 pnpm dev
 
 # Or start individually
-pnpm dev:api    # API only (http://localhost:3001)
+pnpm dev:api    # API only (http://localhost:3000)
 pnpm dev:web    # Web app only (http://localhost:5173)
 ```
 
