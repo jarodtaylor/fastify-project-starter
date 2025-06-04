@@ -1,0 +1,10 @@
+{
+	"name": "@test-final-audit/typescript-config",
+	"version": "1.0.0",
+	"main": "base.json",
+	"exports": {
+		"./base.json": "./base.json",
+		".": "./base.json"
+	},
+	"files": ["base.json"]
+}
