@@ -1,0 +1,5 @@
+
+
+> web@ typecheck /Users/jarodtaylor/Code/clients/localpro/localpro-platform/apps/web
+> react-router typegen && tsc
+

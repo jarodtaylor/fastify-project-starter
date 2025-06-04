@@ -11,7 +11,11 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@localpro/*": ["packages/*", "packages/*/src"]
+    }
   },
   "exclude": ["node_modules", "dist"]
 }

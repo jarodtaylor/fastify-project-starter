@@ -1,5 +1,12 @@
 {
   "name": "@localpro/typescript-config",
   "version": "1.0.0",
-  "main": "base.json"
+  "main": "base.json",
+  "exports": {
+    "./base.json": "./base.json",
+    ".": "./base.json"
+  },
+  "files": [
+    "base.json"
+  ]
 }

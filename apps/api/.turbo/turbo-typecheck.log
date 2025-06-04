@@ -1,0 +1,5 @@
+
+
+> api@1.0.0 typecheck /Users/jarodtaylor/Code/clients/localpro/localpro-platform/apps/api
+> tsc --noEmit
+

@@ -1,8 +1,9 @@
 {
-  "extends": "@localpro/typescript-config/base.json",
+  "extends": "../../packages/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "noEmit": false
+    "noEmit": false,
+    "baseUrl": "../../"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
