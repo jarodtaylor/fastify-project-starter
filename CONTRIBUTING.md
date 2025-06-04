@@ -176,6 +176,20 @@ grep -r "fastify-react-router-starter" test-project/  # Should be minimal
 grep -r "@test-project" test-project/  # Should find scoped packages
 ```
 
+**Issue**: CI pnpm lockfile compatibility
+
+```bash
+# Symptoms: CI fails with "ignoring not compatible lockfile"
+# Cause: pnpm version mismatch between package.json and CI workflows
+# Solution: Align versions in:
+# - package.json: "packageManager": "pnpm@X.Y.Z"
+# - .github/workflows/*.yml: version: X
+
+# Check current alignment:
+grep "packageManager" package.json
+grep "version:" .github/workflows/*.yml | grep pnpm -A1
+```
+
 **Issue**: CLI validation failing
 
 ```bash
