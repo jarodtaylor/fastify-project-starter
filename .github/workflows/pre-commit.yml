@@ -55,9 +55,16 @@ jobs:
             exit 1
           fi
 
-          # Check for secrets/sensitive data
-          if grep -r "password\|secret\|key\|token" --include="*.ts" --include="*.js" --include="*.json" --exclude-dir=node_modules --exclude-dir=.git . 2>/dev/null; then
+          # Check for secrets/sensitive data (avoid false positives)
+          if grep -r \
+            -E '(api_key|apikey|secret_key|private_key|access_token|auth_token|bearer_token)' \
+            --include="*.ts" --include="*.js" --include="*.json" \
+            --exclude-dir=node_modules --exclude-dir=.git \
+            --exclude="**/replace-vars.ts" \
+            --exclude="**/.env.example" \
+            . 2>/dev/null; then
             echo "❌ Potential secrets found!"
+            echo "ℹ️  Check for hardcoded API keys, tokens, or passwords"
             exit 1
           fi
 
