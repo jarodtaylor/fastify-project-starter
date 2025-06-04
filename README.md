@@ -1,6 +1,6 @@
 # create-fastify-react-router
 
-> 🚀 A CLI generator for modern fullstack monorepo applications with Fastify API and React Router 7 frontend.
+> A CLI generator for modern fullstack monorepo applications with Fastify API and React Router 7 frontend.
 
 ## Quick Start
 
