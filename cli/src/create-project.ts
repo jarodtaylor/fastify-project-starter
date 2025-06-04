@@ -49,64 +49,79 @@ export async function createProject(
   spinner.succeed("Customized template");
 
   // Install dependencies
+  let dependenciesInstalled = false;
   if (options.install) {
     spinner.start("Installing dependencies...");
     try {
       await execa("pnpm", ["install"], { cwd: projectPath });
+      dependenciesInstalled = true;
       spinner.succeed("Installed dependencies");
+
+      // Format generated code after dependencies are installed
+      spinner.start("Formatting generated code...");
+      try {
+        await execa("pnpm", ["format"], { cwd: projectPath });
+        spinner.succeed("Formatted generated code");
+      } catch (error) {
+        spinner.warn("Could not format generated code");
+      }
     } catch (error) {
-      spinner.warn("Failed to install dependencies");
+      spinner.fail("Failed to install dependencies");
       console.log(
-        chalk.yellow("You can install them manually with: pnpm install")
+        chalk.red(
+          `Error: ${error instanceof Error ? error.message : String(error)}`
+        )
+      );
+      console.log(
+        chalk.yellow(
+          "You must install dependencies manually with: pnpm install"
+        )
       );
     }
   }
 
-  // Initialize database
-  if (options.orm === "prisma") {
+  // Initialize database (only if dependencies are installed)
+  if (options.orm === "prisma" && dependenciesInstalled) {
     spinner.start("Setting up database...");
     try {
-      // Copy .env file
+      // Copy .env files to both root and database package
       await execa("cp", [".env.example", ".env"], { cwd: projectPath });
-
-      // Generate Prisma client
       await execa(
-        "npx",
-        [
-          "prisma",
-          "generate",
-          "--schema=packages/database/prisma/schema.prisma",
-        ],
-        {
-          cwd: projectPath,
-          env: { DATABASE_URL: "file:./data/dev.db" },
-        }
+        "cp",
+        ["packages/database/.env.example", "packages/database/.env"],
+        { cwd: projectPath }
       );
 
-      // Push database schema
-      await execa(
-        "npx",
-        [
-          "prisma",
-          "db",
-          "push",
-          "--schema=packages/database/prisma/schema.prisma",
-        ],
-        {
-          cwd: projectPath,
-          env: { DATABASE_URL: "file:./data/dev.db" },
-        }
-      );
+      // Generate Prisma client (run from database package directory)
+      await execa("pnpm", ["prisma", "generate"], {
+        cwd: resolve(projectPath, "packages/database"),
+      });
+
+      // Push database schema (run from database package directory)
+      await execa("pnpm", ["prisma", "db", "push"], {
+        cwd: resolve(projectPath, "packages/database"),
+      });
 
       spinner.succeed("Set up database");
     } catch (error) {
-      spinner.warn("Failed to set up database");
+      spinner.fail("Failed to set up database");
+      console.log(
+        chalk.red(
+          `Error: ${error instanceof Error ? error.message : String(error)}`
+        )
+      );
       console.log(
         chalk.yellow(
           "You can set it up manually with the instructions in the README"
         )
       );
     }
+  } else if (options.orm === "prisma" && !dependenciesInstalled) {
+    console.log(
+      chalk.yellow(
+        "⚠️  Skipping database setup because dependencies installation failed"
+      )
+    );
   }
 
   // Initialize git
@@ -143,14 +158,13 @@ export async function createProject(
       console.log(chalk.cyan("   cp .env.example .env"));
       console.log(
         chalk.cyan(
-          "   npx prisma generate --schema=packages/database/prisma/schema.prisma"
+          "   cp packages/database/.env.example packages/database/.env"
         )
       );
       console.log(
-        chalk.cyan(
-          "   npx prisma db push --schema=packages/database/prisma/schema.prisma"
-        )
+        chalk.cyan("   cd packages/database && pnpm prisma generate")
       );
+      console.log(chalk.cyan("   cd packages/database && pnpm prisma db push"));
     }
 
     console.log(chalk.yellow("\n🚀 Start development:"));
