@@ -1,4 +1,6 @@
+import { existsSync } from "node:fs";
 import { readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import type { ProjectOptions } from "../create-project.js";
 
@@ -109,6 +111,11 @@ export async function replaceTemplateVars(
 	// Handle ORM-specific configurations
 	if (options.orm === "none") {
 		await removePrismaConfig(projectPath);
+	}
+
+	// Handle linter-specific configurations
+	if (options.lint === "eslint") {
+		await configureLinter(projectPath, options.lint);
 	}
 }
 
@@ -227,9 +234,201 @@ async function updateDatabaseDependencies(
 }
 
 async function removePrismaConfig(projectPath: string): Promise<void> {
-	// This would remove Prisma-related files and dependencies
-	// For now, just log that this option was selected
-	console.log(
-		"Note: --orm=none selected. You may want to remove Prisma-related files manually.",
-	);
+	try {
+		// Remove the entire database package
+		const databasePackagePath = join(projectPath, "packages", "database");
+		if (existsSync(databasePackagePath)) {
+			await rm(databasePackagePath, { recursive: true, force: true });
+		}
+
+		// Remove database-related scripts from root package.json
+		const rootPackageJsonPath = join(projectPath, "package.json");
+		if (existsSync(rootPackageJsonPath)) {
+			const packageContent = await readFile(rootPackageJsonPath, "utf-8");
+			const packageJson = JSON.parse(packageContent);
+
+			// Remove database scripts using destructuring
+			if (packageJson.scripts) {
+				const {
+					"db:generate": _generate,
+					"db:push": _push,
+					"db:reset": _reset,
+					"db:studio": _studio,
+					"db:migrate": _migrate,
+					...remainingScripts
+				} = packageJson.scripts;
+				packageJson.scripts = remainingScripts;
+			}
+
+			await writeFile(
+				rootPackageJsonPath,
+				JSON.stringify(packageJson, null, "\t"),
+				"utf-8",
+			);
+		}
+
+		// Update workspace configuration to remove database package
+		const workspaceConfigPath = join(projectPath, "pnpm-workspace.yaml");
+		if (existsSync(workspaceConfigPath)) {
+			let workspaceContent = await readFile(workspaceConfigPath, "utf-8");
+			workspaceContent = workspaceContent.replace(
+				/\s*- "packages\/database"/g,
+				"",
+			);
+			await writeFile(workspaceConfigPath, workspaceContent, "utf-8");
+		}
+
+		// Remove database imports from API if they exist
+		const apiIndexPath = join(projectPath, "apps", "api", "src", "index.ts");
+		if (existsSync(apiIndexPath)) {
+			let apiContent = await readFile(apiIndexPath, "utf-8");
+			// Remove database-related imports with more specific patterns
+			apiContent = apiContent.replace(
+				/import.*from\s+['"]@[^'"]*\/database['"];\n?/g,
+				"",
+			);
+			apiContent = apiContent.replace(
+				/import.*from\s+['"]@prisma\/client['"];\n?/g,
+				"",
+			);
+			apiContent = apiContent.replace(
+				/import.*from\s+['"]\.\.?\/.*database.*['"];\n?/g,
+				"",
+			);
+			await writeFile(apiIndexPath, apiContent, "utf-8");
+		}
+
+		// Remove database-related routes
+		const apiRoutesPath = join(projectPath, "apps", "api", "src", "routes");
+		if (existsSync(apiRoutesPath)) {
+			const routeFiles = await readdir(apiRoutesPath);
+			for (const file of routeFiles) {
+				if (file.includes("todo") || file.includes("db")) {
+					await rm(join(apiRoutesPath, file), { force: true });
+				}
+			}
+		}
+
+		console.log("✓ Removed Prisma configuration and database package");
+	} catch (error) {
+		console.warn("Warning: Could not fully remove Prisma configuration");
+	}
+}
+
+async function configureLinter(
+	projectPath: string,
+	linter: "eslint",
+): Promise<void> {
+	try {
+		// Remove Biome configuration file
+		const biomeConfigPath = join(projectPath, "biome.json");
+		if (existsSync(biomeConfigPath)) {
+			await rm(biomeConfigPath, { force: true });
+		}
+
+		// Update root package.json to replace Biome with ESLint
+		const rootPackageJsonPath = join(projectPath, "package.json");
+		if (existsSync(rootPackageJsonPath)) {
+			const packageContent = await readFile(rootPackageJsonPath, "utf-8");
+			const packageJson = JSON.parse(packageContent);
+
+			// Remove Biome dependency and add ESLint dependencies
+			if (packageJson.devDependencies) {
+				const { "@biomejs/biome": _biome, ...remainingDevDeps } =
+					packageJson.devDependencies;
+
+				packageJson.devDependencies = {
+					...remainingDevDeps,
+					eslint: "^9.17.0",
+					"@typescript-eslint/eslint-plugin": "^8.18.1",
+					"@typescript-eslint/parser": "^8.18.1",
+					"eslint-config-prettier": "^9.1.0",
+					prettier: "^3.4.2",
+				};
+			}
+
+			// Update scripts to use ESLint instead of Biome
+			if (packageJson.scripts) {
+				const {
+					format: _format,
+					"format:check": _formatCheck,
+					check: _check,
+					...remainingScripts
+				} = packageJson.scripts;
+
+				packageJson.scripts = {
+					...remainingScripts,
+					lint: "eslint . --ext .ts,.tsx,.js,.jsx",
+					"lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+					format: "prettier --write .",
+					"format:check": "prettier --check .",
+					check: "pnpm lint && pnpm typecheck",
+				};
+			}
+
+			await writeFile(
+				rootPackageJsonPath,
+				JSON.stringify(packageJson, null, "\t"),
+				"utf-8",
+			);
+		}
+
+		// Create ESLint configuration file
+		const eslintConfig = {
+			root: true,
+			env: {
+				browser: true,
+				es2022: true,
+				node: true,
+			},
+			extends: [
+				"eslint:recommended",
+				"@typescript-eslint/recommended",
+				"prettier",
+			],
+			parser: "@typescript-eslint/parser",
+			parserOptions: {
+				ecmaVersion: "latest",
+				sourceType: "module",
+			},
+			plugins: ["@typescript-eslint"],
+			rules: {
+				"@typescript-eslint/no-unused-vars": [
+					"error",
+					{ argsIgnorePattern: "^_" },
+				],
+				"@typescript-eslint/no-explicit-any": "warn",
+			},
+			ignorePatterns: ["dist/", "build/", "node_modules/", ".turbo/"],
+		};
+
+		const eslintConfigPath = join(projectPath, "eslint.config.js");
+		const eslintConfigContent = `module.exports = ${JSON.stringify(
+			eslintConfig,
+			null,
+			2,
+		)};`;
+		await writeFile(eslintConfigPath, eslintConfigContent, "utf-8");
+
+		// Create Prettier configuration file
+		const prettierConfig = {
+			semi: true,
+			trailingComma: "es5",
+			singleQuote: false,
+			printWidth: 80,
+			tabWidth: 2,
+			useTabs: false,
+		};
+
+		const prettierConfigPath = join(projectPath, ".prettierrc");
+		await writeFile(
+			prettierConfigPath,
+			JSON.stringify(prettierConfig, null, 2),
+			"utf-8",
+		);
+
+		console.log("✓ Configured ESLint and Prettier");
+	} catch (error) {
+		console.warn("Warning: Could not fully configure ESLint");
+	}
 }

@@ -16,10 +16,31 @@ const EXCLUDE_PATTERNS = [
 	"*.log",
 	".DS_Store",
 	"*.db",
+	// Development and contributor files
+	".github",
+	"CONTRIBUTING.md",
+	"DEVELOPMENT.md",
+	// Environment files (only .env.example should be copied)
+	".env",
+	".env.local",
+	// Docker files for default template (can be added later as option)
+	"**/Dockerfile",
+	"**/.dockerignore",
 ];
 
-function shouldExclude(filename: string): boolean {
+function shouldExclude(filename: string, fullPath?: string): boolean {
 	return EXCLUDE_PATTERNS.some((pattern) => {
+		// Handle ** patterns for nested paths
+		if (pattern.includes("**")) {
+			if (fullPath) {
+				const regex = new RegExp(
+					pattern.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*"),
+				);
+				return regex.test(fullPath);
+			}
+			return false;
+		}
+
 		if (pattern.includes("*")) {
 			const regex = new RegExp(pattern.replace(/\*/g, ".*"));
 			return regex.test(filename);
@@ -32,11 +53,17 @@ function shouldExclude(filename: string): boolean {
 	});
 }
 
-async function copyRecursive(src: string, dest: string): Promise<void> {
+async function copyRecursive(
+	src: string,
+	dest: string,
+	basePath?: string,
+): Promise<void> {
 	const entries = await readdir(src);
 
 	for (const entry of entries) {
-		if (shouldExclude(entry)) {
+		const relativePath = basePath ? `${basePath}/${entry}` : entry;
+
+		if (shouldExclude(entry, relativePath)) {
 			continue;
 		}
 
@@ -48,7 +75,7 @@ async function copyRecursive(src: string, dest: string): Promise<void> {
 			if (!existsSync(destPath)) {
 				mkdirSync(destPath, { recursive: true });
 			}
-			await copyRecursive(srcPath, destPath);
+			await copyRecursive(srcPath, destPath, relativePath);
 		} else {
 			await cp(srcPath, destPath);
 		}

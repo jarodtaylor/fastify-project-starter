@@ -1,5 +1,5 @@
 {
-	"name": "fastify-react-router-starter",
+	"name": "test-final-audit",
 	"version": "1.0.0",
 	"description": "A monorepo template for building fullstack applications with Fastify APIs and React Router 7 frontends",
 	"keywords": [
@@ -16,17 +16,17 @@
 		"boilerplate",
 		"template"
 	],
-	"homepage": "https://github.com/jarodtaylor/fastify-react-router-starter#readme",
+	"homepage": "https://github.com/jarodtaylor/test-final-audit#readme",
 	"bugs": {
-		"url": "https://github.com/jarodtaylor/fastify-react-router-starter/issues"
+		"url": "https://github.com/jarodtaylor/test-final-audit/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jarodtaylor/fastify-react-router-starter.git"
+		"url": "https://github.com/jarodtaylor/test-final-audit.git"
 	},
 	"license": "MIT",
 	"author": {
-		"name": "Jarod Taylor",
+		"name": "Your Name",
 		"url": "https://github.com/jarodtaylor"
 	},
 	"type": "module",
@@ -48,8 +48,8 @@
 		"typecheck": "turbo typecheck",
 		"test": "turbo run test",
 		"audit": "pnpm audit",
-		"check": "pnpm format:check && pnpm typecheck",
-		"ci": "biome ci && pnpm typecheck",
+		"check": "biome ci && pnpm typecheck",
+		"precheck": "pnpm lint && pnpm format && pnpm check && pnpm test && pnpm audit",
 		"db:generate": "cd packages/database && pnpm db:generate",
 		"db:push": "cd packages/database && pnpm db:push",
 		"db:reset": "cd packages/database && pnpm db:reset",
