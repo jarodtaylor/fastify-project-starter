@@ -4,7 +4,7 @@ A modern, production-ready monorepo template for building fullstack applications
 
 ## Features
 
-- **Monorepo**: Usiong [pnpm workspaces](https://pnpm.io/workspaces) + [Turborepo](https://turborepo.com/docs)
+- **Monorepo**: Using [pnpm workspaces](https://pnpm.io/workspaces) + [Turborepo](https://turborepo.com/docs)
 - **API Backend**: [Fastify](https://fastify.dev/) with TypeScript and hot reload
 - **Frontend**: [React Router 7](https://reactrouter.com/home) with SSR and [Tailwind 4](https://tailwindcss.com/docs)
 - **Developer Experience**: [Biome](https://biomejs.dev/) for formatting and linting
