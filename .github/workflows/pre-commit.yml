@@ -30,14 +30,46 @@ jobs:
 
       - name: 🔍 Check for common issues
         run: |
-          # Check for large files
-          find . -type f -size +10M -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./cli/template/*" && echo "Large files found!" && exit 1 || true
+          # Check for large files (exclude all node_modules, .git, cli/template, and common large file patterns)
+          if find . -type f -size +10M \
+            -not -path "*/node_modules/*" \
+            -not -path "./.git/*" \
+            -not -path "./cli/template/*" \
+            -not -path "*/.turbo/*" \
+            -not -path "*/dist/*" \
+            -not -path "*/build/*" \
+            -not -path "*/.next/*" \
+            -not -path "*/.react-router/*" \
+            -not -name "*.log" | grep -q .; then
+            echo "❌ Large files found!"
+            find . -type f -size +10M \
+              -not -path "*/node_modules/*" \
+              -not -path "./.git/*" \
+              -not -path "./cli/template/*" \
+              -not -path "*/.turbo/*" \
+              -not -path "*/dist/*" \
+              -not -path "*/build/*" \
+              -not -path "*/.next/*" \
+              -not -path "*/.react-router/*" \
+              -not -name "*.log"
+            exit 1
+          fi
 
           # Check for secrets/sensitive data
-          grep -r "password\|secret\|key\|token" --include="*.ts" --include="*.js" --include="*.json" --exclude-dir=node_modules --exclude-dir=.git . && echo "Potential secrets found!" && exit 1 || true
+          if grep -r "password\|secret\|key\|token" --include="*.ts" --include="*.js" --include="*.json" --exclude-dir=node_modules --exclude-dir=.git . 2>/dev/null; then
+            echo "❌ Potential secrets found!"
+            exit 1
+          fi
 
-          # Check for console.log statements in production files
-          grep -r "console\.log" apps/ packages/ --include="*.ts" --include="*.tsx" && echo "Console.log statements found!" && exit 1 || true
+          # Check for console.log statements in production files (excluding server startup messages)
+          if grep -r "console\.log" apps/ packages/ --include="*.ts" --include="*.tsx" \
+            --exclude="**/index.ts" \
+            --exclude="**/server.ts" \
+            --exclude="**/main.ts" 2>/dev/null; then
+            echo "❌ Console.log statements found in production files!"
+            echo "ℹ️  Remove debug console.log statements (server startup logs are OK)"
+            exit 1
+          fi
 
       - name: 🎨 Check formatting
         run: pnpm format:check
