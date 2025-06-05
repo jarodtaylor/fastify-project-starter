@@ -7,28 +7,33 @@ A **production-ready starter** that gives you everything needed to build scalabl
 ## ✨ What's Included
 
 ### 🚀 **High-Performance API** (Fastify)
+
 - TypeScript-first with full type safety
 - 65k+ requests/sec capability (2x faster than Express)
 - Built-in CORS, error handling, and validation
 - Hot reload development experience
 
 ### ⚛️ **Modern React Frontend** (React Router 7)
+
 - Server-side rendering (SSR) for SEO
 - File-based routing with nested layouts
 - Optimistic UI updates and form actions
 - Responsive design with utility-first CSS
 
 ### 🗄️ **Database Ready** (Prisma ORM)
+
 - SQLite for development, PostgreSQL/MySQL for production
 - Type-safe database queries and migrations
 - Visual database browser with Prisma Studio
 
 ### 📦 **Monorepo Architecture** (Turborepo)
+
 - Shared packages for code reuse
 - Optimized build caching and parallelization
 - Independent app scaling and deployment
 
 ### 🔧 **Developer Experience**
+
 - TypeScript everywhere with strict type checking
 - Code formatting and linting (Biome)
 - Hot reload for both frontend and backend
@@ -57,8 +62,9 @@ pnpm dev
 ```
 
 **That's it!** Your fullstack application is running:
+
 - 🌐 **Frontend**: http://localhost:5173
-- 🚀 **API**: http://localhost:3000  
+- 🚀 **API**: http://localhost:3000
 - 🗄️ **Database Studio**: `pnpm db:studio`
 
 ## 📁 Project Structure
@@ -71,7 +77,7 @@ my-app/
 │   │   │   ├── index.ts         # Server entry point
 │   │   │   └── routes/          # API endpoints
 │   │   └── package.json
-│   └── web/                 # React Router 7 frontend  
+│   └── web/                 # React Router 7 frontend
 │       ├── app/
 │       │   ├── routes/          # File-based routing
 │       │   ├── components/      # React components
@@ -105,7 +111,7 @@ pnpm lint             # Lint code
 
 # Database
 pnpm db:generate      # Generate Prisma client
-pnpm db:push          # Push schema to database  
+pnpm db:push          # Push schema to database
 pnpm db:studio        # Open database browser
 pnpm db:migrate       # Create and run migrations
 pnpm db:reset         # Reset database with fresh data
@@ -114,12 +120,13 @@ pnpm db:reset         # Reset database with fresh data
 ### Adding Features
 
 #### New API Endpoint
+
 ```typescript
 // apps/api/src/routes/users.ts
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync } from "fastify";
 
 const users: FastifyPluginAsync = async (fastify) => {
-  fastify.get('/api/users', async () => {
+  fastify.get("/api/users", async () => {
     // Your logic here
     return { users: [] };
   });
@@ -129,13 +136,14 @@ export default users;
 ```
 
 #### New Frontend Route
+
 ```tsx
 // apps/web/app/routes/users.tsx
 import type { Route } from "./+types/users";
 
 export async function loader({ request }: Route.LoaderArgs) {
   // Fetch data from API
-  const users = await fetch('/api/users').then(r => r.json());
+  const users = await fetch("/api/users").then((r) => r.json());
   return { users };
 }
 
@@ -150,6 +158,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
 ```
 
 #### Database Model
+
 ```prisma
 // packages/database/prisma/schema.prisma
 model User {
@@ -162,6 +171,7 @@ model User {
 ```
 
 After adding models, run:
+
 ```bash
 pnpm db:push  # Development
 # or
@@ -171,9 +181,11 @@ pnpm db:migrate dev --name add-user-model  # Production
 ## 🗄️ Database Setup
 
 ### Development (SQLite - Default)
+
 No setup required! Database file is created automatically at `data/dev.db`.
 
 ### Production (PostgreSQL)
+
 1. **Get a PostgreSQL database** (Railway, Supabase, Neon, etc.)
 2. **Update `.env`**:
    ```env
@@ -185,6 +197,7 @@ No setup required! Database file is created automatically at `data/dev.db`.
    ```
 
 ### Production (MySQL)
+
 1. **Get a MySQL database** (PlanetScale, AWS RDS, etc.)
 2. **Update `.env`**:
    ```env
@@ -198,6 +211,7 @@ No setup required! Database file is created automatically at `data/dev.db`.
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 npm i -g vercel
 vercel
@@ -205,12 +219,14 @@ vercel
 ```
 
 ### Railway
+
 ```bash
 npm i -g @railway/cli
 railway login && railway init && railway up
 ```
 
 ### Docker
+
 ```bash
 docker build -t my-app .
 docker run -p 3000:3000 my-app
@@ -236,7 +252,7 @@ Generate projects with different configurations:
 npx create-fastify-react-router my-app --db postgres
 npx create-fastify-react-router my-app --db mysql
 
-# Linting options  
+# Linting options
 npx create-fastify-react-router my-app --lint eslint
 
 # Skip installation
