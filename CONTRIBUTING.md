@@ -1,6 +1,6 @@
 # Contributing to create-fastify-react-router
 
-Thank you for your interest in contributing! This project consists of a **living template** and a **CLI generator** that creates new projects from that template.
+This project consists of a **living template** and a **CLI generator** that creates new projects from that template.
 
 ## 🏗️ Project Structure
 
