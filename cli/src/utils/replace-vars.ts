@@ -245,7 +245,14 @@ async function removePrismaConfig(projectPath: string): Promise<void> {
 		const rootPackageJsonPath = join(projectPath, "package.json");
 		if (existsSync(rootPackageJsonPath)) {
 			const packageContent = await readFile(rootPackageJsonPath, "utf-8");
-			const packageJson = JSON.parse(packageContent);
+			let packageJson: { scripts?: Record<string, string> };
+			try {
+				packageJson = JSON.parse(packageContent) as {
+					scripts?: Record<string, string>;
+				};
+			} catch (error) {
+				throw new Error(`Invalid JSON in package.json: ${error}`);
+			}
 
 			// Remove database scripts using destructuring
 			if (packageJson.scripts) {
@@ -298,13 +305,14 @@ async function removePrismaConfig(projectPath: string): Promise<void> {
 			await writeFile(apiIndexPath, apiContent, "utf-8");
 		}
 
-		// Remove database-related routes
+		// Remove database-related routes (be specific about file names)
 		const apiRoutesPath = join(projectPath, "apps", "api", "src", "routes");
 		if (existsSync(apiRoutesPath)) {
-			const routeFiles = await readdir(apiRoutesPath);
-			for (const file of routeFiles) {
-				if (file.includes("todo") || file.includes("db")) {
-					await rm(join(apiRoutesPath, file), { force: true });
+			const routeFilesToRemove = ["todos.ts", "db.ts", "database.ts"];
+			for (const fileName of routeFilesToRemove) {
+				const filePath = join(apiRoutesPath, fileName);
+				if (existsSync(filePath)) {
+					await rm(filePath, { force: true });
 				}
 			}
 		}

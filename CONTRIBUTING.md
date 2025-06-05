@@ -332,6 +332,219 @@ Before submitting a PR, ensure:
 - [ ] **Error handling works**: Test `--no-install` shows proper instructions
 - [ ] **Documentation updated**: If behavior changes
 
+### 🔍 Validation Patterns and Workflows
+
+These are proven validation techniques used during development to catch issues early and ensure reliability.
+
+#### **1. Comprehensive Check Workflow**
+
+Always start with our comprehensive validation suite:
+
+```bash
+# Run the full validation pipeline
+pnpm run check    # format:check + typecheck
+pnpm run ci       # biome ci + typecheck (stricter, CI-equivalent)
+
+# If anything fails, fix immediately:
+pnpm format       # Auto-fix formatting
+pnpm typecheck    # Check for TypeScript errors
+```
+
+**When to use**: After any code changes, before commits, when CI fails.
+
+#### **2. CLI Validation Testing**
+
+Test CLI robustness with edge cases and invalid inputs:
+
+```bash
+cd cli && pnpm build  # Always rebuild after CLI changes
+
+# Test error handling - these should FAIL gracefully:
+node dist/index.js test-project --db invalid-option     # Should show clear error
+node dist/index.js existing-directory                   # Should detect existing dir
+node dist/index.js ""                                   # Should prompt for name
+node dist/index.js invalid@name                         # Should reject invalid chars
+
+# Test logical validation - these should WARN but continue:
+node dist/index.js test --orm none --db postgres        # Should warn db ignored
+
+# Test successful generation with different combinations:
+node dist/index.js test-sqlite --db sqlite --no-install --no-git
+node dist/index.js test-postgres --db postgres --no-install --no-git
+node dist/index.js test-eslint --lint eslint --no-install --no-git
+node dist/index.js test-none --orm none --no-install --no-git
+
+# Always clean up: rm -rf test-*
+```
+
+**When to use**: After CLI changes, input validation changes, or error handling modifications.
+
+#### **3. Generated Project Validation**
+
+Verify that generated projects work correctly:
+
+```bash
+# Quick structure validation (no dependencies):
+cd cli && node dist/index.js test-quick --no-install --no-git
+ls test-quick/packages/        # Should see: database, shared-utils, typescript-config, ui
+ls test-quick/apps/           # Should see: api, web
+grep -r "@test-quick" test-quick/  # Check variable replacement worked
+
+# Full integration test (with dependencies):
+node dist/index.js test-full
+cd test-full
+pnpm install                  # Should succeed without errors
+pnpm typecheck               # Should pass TypeScript validation
+pnpm dev                     # Should start both API and web servers
+# Test API: curl http://localhost:3000/api/todos
+# Test Web: open http://localhost:5173
+```
+
+**When to use**: After template changes, variable replacement changes, or dependency updates.
+
+#### **4. Template-Only Validation**
+
+Test the template directly (without CLI):
+
+```bash
+# In the main project root:
+pnpm install
+pnpm typecheck               # Should pass
+pnpm format:check            # Should pass
+pnpm dev                     # Should start servers
+
+# Database validation:
+pnpm db:push                 # Should set up schema
+pnpm db:studio               # Should open Prisma Studio
+# API test: curl http://localhost:3000/api/todos
+```
+
+**When to use**: After template changes, dependency updates, or database schema changes.
+
+#### **5. Hardening and Security Validation**
+
+Test input validation, error handling, and edge cases:
+
+```bash
+# Test CLI input validation (after rebuilding):
+cd cli && pnpm build
+
+# Invalid database types:
+node dist/index.js test --db invalid        # Should error clearly
+node dist/index.js test --orm invalid       # Should error clearly
+node dist/index.js test --lint invalid      # Should error clearly
+
+# File system edge cases:
+mkdir existing-dir
+node dist/index.js existing-dir             # Should detect and error
+rmdir existing-dir
+
+# Test partial failures and recovery:
+node dist/index.js test-partial --no-install  # Should create project but warn about setup
+cd test-partial && pnpm install               # Manual install should work
+```
+
+**When to use**: After input validation changes, error handling updates, or security-related modifications.
+
+#### **6. Regression Testing Pattern**
+
+When fixing bugs, always test the specific scenario that was broken:
+
+```bash
+# Example: If CLI validation was broken for invalid --db options
+cd cli && pnpm build
+node dist/index.js test --db mysql          # Should work
+node dist/index.js test --db invalid-db     # Should fail with clear message
+
+# Example: If template generation was missing packages
+node dist/index.js test-packages --no-install --no-git
+ls test-packages/packages/                   # Should include all expected packages
+```
+
+**When to use**: During bug fixes, after reported issues, before releasing fixes.
+
+#### **7. Performance and Reliability Validation**
+
+Test under various conditions:
+
+```bash
+# Large project names:
+node dist/index.js very-long-project-name-with-many-hyphens --no-install --no-git
+
+# Special characters (should be rejected):
+node dist/index.js "project with spaces"     # Should reject
+node dist/index.js "project@special"         # Should reject
+
+# Network conditions (test with slow/no internet):
+node dist/index.js test-offline --no-install # Should work without network
+```
+
+**When to use**: Before major releases, after performance optimizations, or network-related changes.
+
+#### **8. Cross-Platform Validation**
+
+Test on different operating systems and Node versions:
+
+```bash
+# Test different Node versions (if using nvm):
+nvm use 18 && cd cli && pnpm build && node dist/index.js test-node18 --no-install
+nvm use 20 && cd cli && pnpm build && node dist/index.js test-node20 --no-install
+
+# Test different package managers:
+cd generated-project
+rm -rf node_modules package-lock.json yarn.lock
+npm install && npm run dev                   # Should work with npm
+yarn install && yarn dev                     # Should work with yarn
+```
+
+**When to use**: Before releases, after Node.js updates, or package manager changes.
+
+#### **9. Quick Validation Commands**
+
+For rapid iteration during development:
+
+```bash
+# Fastest checks (< 30 seconds):
+pnpm format:check && pnpm typecheck
+
+# Medium checks (< 2 minutes):
+cd cli && pnpm build && node dist/index.js quick-test --no-install --no-git
+ls quick-test/packages/
+
+# Full validation (< 5 minutes):
+cd cli && node dist/index.js full-test
+cd full-test && pnpm install && timeout 10s pnpm dev
+```
+
+**When to use**: During active development, in Git hooks, or for quick confidence checks.
+
+#### **10. Debugging Failed Validations**
+
+When tests fail, use these debugging patterns:
+
+```bash
+# If pnpm check fails:
+pnpm format:check  # Isolate formatting issues
+pnpm typecheck     # Isolate TypeScript issues
+
+# If CLI generation fails:
+cd cli && pnpm build --verbose      # Check build output
+node dist/index.js test --no-install --no-git  # Isolate from network issues
+
+# If generated project fails:
+cd generated-project
+pnpm install --verbose              # Check dependency issues
+pnpm typecheck --verbose            # Check type issues
+ls -la packages/                    # Check file structure
+
+# If database setup fails:
+cd generated-project
+cat .env.example                    # Check environment template
+ls packages/database/prisma/        # Check schema files exist
+```
+
+**When to use**: When any validation step fails, for debugging CI issues, or troubleshooting user reports.
+
 ## 🚀 Publishing and Release Process
 
 ### Publishing CLI Updates

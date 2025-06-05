@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import inquirer from "inquirer";
 import validateNpmPackageName from "validate-npm-package-name";
+import type { ProjectOptions } from "../create-project.js";
 
 export async function validateProjectName(
 	providedName?: string,
@@ -45,4 +46,43 @@ export async function validateProjectName(
 	]);
 
 	return projectName;
+}
+
+export function validateProjectOptions(options: Partial<ProjectOptions>): void {
+	// Validate database option
+	if (options.db && !["sqlite", "postgres", "mysql"].includes(options.db)) {
+		throw new Error(
+			`Invalid database option: ${options.db}. Must be one of: sqlite, postgres, mysql`,
+		);
+	}
+
+	// Validate ORM option
+	if (options.orm && !["prisma", "none"].includes(options.orm)) {
+		throw new Error(
+			`Invalid ORM option: ${options.orm}. Must be one of: prisma, none`,
+		);
+	}
+
+	// Validate linter option
+	if (options.lint && !["biome", "eslint"].includes(options.lint)) {
+		throw new Error(
+			`Invalid linter option: ${options.lint}. Must be one of: biome, eslint`,
+		);
+	}
+
+	// Validate boolean options
+	if (options.install !== undefined && typeof options.install !== "boolean") {
+		throw new Error("Install option must be a boolean");
+	}
+
+	if (options.git !== undefined && typeof options.git !== "boolean") {
+		throw new Error("Git option must be a boolean");
+	}
+
+	// Validate logical combinations
+	if (options.orm === "none" && options.db && options.db !== "sqlite") {
+		console.warn(
+			"⚠️  Warning: Database option is ignored when ORM is set to 'none'",
+		);
+	}
 }

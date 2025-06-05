@@ -7,6 +7,7 @@ import ora from "ora";
 import { copyTemplate } from "./utils/copy-template.js";
 import { promptForOptions } from "./utils/prompts.js";
 import { replaceTemplateVars } from "./utils/replace-vars.js";
+import { validateProjectOptions } from "./utils/validation.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -28,6 +29,9 @@ export async function createProject(
 	if (existsSync(projectPath)) {
 		throw new Error(`Directory "${projectName}" already exists`);
 	}
+
+	// Validate CLI options early
+	validateProjectOptions(cliOptions);
 
 	// Prompt for missing options
 	const options = await promptForOptions(cliOptions);
