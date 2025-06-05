@@ -1,10 +1,42 @@
-# create-fastify-react-router
+# Fastify React Router Starter
 
-> A powerful CLI generator for modern fullstack monorepo applications with Fastify API and React Router 7 frontend.
+> Modern fullstack monorepo template with Fastify API, React Router 7 frontend, and TypeScript throughout.
 
-**⚡ Production-ready in 60 seconds** - Complete fullstack application with database, authentication-ready structure, and modern tooling.
+A **production-ready starter** that gives you everything needed to build scalable fullstack applications. Built with modern tools and best practices.
 
-## Quick Start
+## ✨ What's Included
+
+### 🚀 **High-Performance API** (Fastify)
+- TypeScript-first with full type safety
+- 65k+ requests/sec capability (2x faster than Express)
+- Built-in CORS, error handling, and validation
+- Hot reload development experience
+
+### ⚛️ **Modern React Frontend** (React Router 7)
+- Server-side rendering (SSR) for SEO
+- File-based routing with nested layouts
+- Optimistic UI updates and form actions
+- Responsive design with utility-first CSS
+
+### 🗄️ **Database Ready** (Prisma ORM)
+- SQLite for development, PostgreSQL/MySQL for production
+- Type-safe database queries and migrations
+- Visual database browser with Prisma Studio
+
+### 📦 **Monorepo Architecture** (Turborepo)
+- Shared packages for code reuse
+- Optimized build caching and parallelization
+- Independent app scaling and deployment
+
+### 🔧 **Developer Experience**
+- TypeScript everywhere with strict type checking
+- Code formatting and linting (Biome)
+- Hot reload for both frontend and backend
+- Comprehensive tooling and scripts
+
+## 🚀 Quick Start
+
+### Option 1: Use the CLI (Recommended)
 
 ```bash
 npx create-fastify-react-router my-app
@@ -12,392 +44,235 @@ cd my-app
 pnpm dev
 ```
 
-**That's it!** You'll have a complete fullstack application running:
+### Option 2: Clone and Fork
 
-- 🚀 **API Server**: http://localhost:3000
+```bash
+git clone https://github.com/jarodtaylor/fastify-react-router-starter.git my-app
+cd my-app
+rm -rf .git && git init
+pnpm install
+cp .env.example .env
+pnpm db:push
+pnpm dev
+```
+
+**That's it!** Your fullstack application is running:
 - 🌐 **Frontend**: http://localhost:5173
-- 🗄️ **Database**: SQLite with sample data
+- 🚀 **API**: http://localhost:3000  
+- 🗄️ **Database Studio**: `pnpm db:studio`
 
-## Why Choose This Starter?
-
-- **🏎️ Performance First** - Fastify is 2x faster than Express
-- **🧩 Modern Architecture** - Monorepo with shared packages
-- **🗄️ Database Flexible** - SQLite, PostgreSQL, or MySQL with zero config
-- **📱 SSR Ready** - React Router 7 with server-side rendering
-- **🔧 Developer Experience** - TypeScript, hot reload, linting, formatting
-- **🚀 Deploy Anywhere** - Vercel, Railway, Docker, or traditional hosting
-
-## CLI Options & Examples
-
-### Basic Usage
-
-```bash
-npx create-fastify-react-router my-app
-```
-
-### Database Options
-
-```bash
-# SQLite (default) - Zero configuration
-npx create-fastify-react-router my-app
-
-# PostgreSQL - Production ready
-npx create-fastify-react-router my-app --db postgres
-
-# MySQL - Enterprise ready
-npx create-fastify-react-router my-app --db mysql
-```
-
-### Development Preferences
-
-```bash
-# Use ESLint instead of Biome
-npx create-fastify-react-router my-app --lint eslint
-
-# Skip dependencies (manual install)
-npx create-fastify-react-router my-app --no-install
-
-# Skip git initialization
-npx create-fastify-react-router my-app --no-git
-
-# Combine options
-npx create-fastify-react-router my-app --db postgres --lint eslint
-```
-
-### All CLI Options
-
-```bash
-npx create-fastify-react-router [project-name] [options]
-
-Arguments:
-  project-name              Name of your project
-
-Options:
-  --db <database>          Database (sqlite, postgres, mysql) [default: sqlite]
-  --orm <orm>              ORM (prisma, none) [default: prisma]
-  --lint <linter>          Linter (biome, eslint) [default: biome]
-  --no-install             Skip dependency installation
-  --no-git                 Skip git repository initialization
-  -h, --help               Display help information
-  -V, --version            Show version number
-```
-
-## What Gets Generated
-
-### Complete Fullstack Monorepo
+## 📁 Project Structure
 
 ```
 my-app/
 ├── apps/
-│   ├── api/              # Fastify API server
+│   ├── api/                 # Fastify API server
 │   │   ├── src/
-│   │   │   ├── index.ts      # Server entry point
-│   │   │   └── routes/       # API routes
+│   │   │   ├── index.ts         # Server entry point
+│   │   │   └── routes/          # API endpoints
 │   │   └── package.json
-│   └── web/              # React Router 7 frontend
+│   └── web/                 # React Router 7 frontend  
 │       ├── app/
-│       │   ├── routes/       # File-based routing
-│       │   └── components/   # React components
+│       │   ├── routes/          # File-based routing
+│       │   ├── components/      # React components
+│       │   └── root.tsx         # App shell
 │       └── package.json
 ├── packages/
-│   ├── database/         # Shared Prisma database
-│   │   ├── prisma/
-│   │   │   └── schema.prisma
-│   │   └── src/
-│   ├── shared-utils/     # Shared utilities
-│   ├── typescript-config/ # Shared TypeScript configs
-│   └── ui/               # Shared UI components
-├── data/                 # SQLite database files (if using SQLite)
-├── package.json          # Root workspace configuration
-├── turbo.json           # Turborepo orchestration
-├── biome.json           # Code formatting & linting
-└── README.md            # Your project documentation
+│   ├── database/            # Shared Prisma database
+│   │   ├── prisma/schema.prisma # Database schema
+│   │   └── src/index.ts         # Database utilities
+│   ├── shared-utils/        # Shared utilities
+│   ├── typescript-config/   # Shared TypeScript configs
+│   └── ui/                  # Shared UI components
+├── data/                    # SQLite database files
+├── .env.example             # Environment variables template
+├── package.json             # Root workspace config
+├── turbo.json              # Monorepo build system
+└── biome.json              # Code quality tools
 ```
 
-### Backend Features (Fastify API)
-
-- **⚡ High Performance** - 65k+ requests/sec capability
-- **🔒 Type Safety** - Full TypeScript integration
-- **🗄️ Database Integration** - Prisma ORM with migrations
-- **🌐 CORS Configuration** - Ready for frontend integration
-- **📊 Error Handling** - Structured error responses
-- **🔄 Hot Reload** - Instant development feedback
-- **📝 Sample CRUD API** - Complete Todo implementation
-
-### Frontend Features (React Router 7)
-
-- **🚀 Server-Side Rendering** - SEO optimized
-- **📁 File-Based Routing** - Intuitive URL structure
-- **🎨 Tailwind CSS** - Utility-first styling
-- **📱 Responsive Design** - Mobile-first approach
-- **⚡ Optimistic UI** - Instant user feedback
-- **🔄 Form Actions** - Built-in form handling
-- **💾 Data Loading** - Efficient data fetching
-
-## Database Configuration Guide
-
-### SQLite (Recommended for Development)
-
-**✅ Pros**: Zero configuration, portable, perfect for development
-**🎯 Use Case**: Local development, prototyping, small applications
-
-```bash
-npx create-fastify-react-router my-app --db sqlite
-```
-
-**No additional setup required!** Database file created at `data/dev.db`.
-
-### PostgreSQL (Recommended for Production)
-
-**✅ Pros**: Robust, scalable, excellent for production
-**🎯 Use Case**: Production applications, complex queries, high concurrency
-
-```bash
-npx create-fastify-react-router my-app --db postgres
-```
-
-**Setup PostgreSQL:**
-
-1. **Install PostgreSQL** locally or use a service (Railway, Supabase, etc.)
-2. **Create database**: `createdb myapp_dev`
-3. **Update `.env`**:
-   ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/myapp_dev"
-   ```
-4. **Run migrations**: `cd packages/database && pnpm prisma db push`
-
-### MySQL (Enterprise Ready)
-
-**✅ Pros**: Mature, widely supported, excellent tooling
-**🎯 Use Case**: Enterprise applications, existing MySQL infrastructure
-
-```bash
-npx create-fastify-react-router my-app --db mysql
-```
-
-**Setup MySQL:**
-
-1. **Install MySQL** locally or use a service (PlanetScale, AWS RDS, etc.)
-2. **Create database**: `CREATE DATABASE myapp_dev;`
-3. **Update `.env`**:
-   ```env
-   DATABASE_URL="mysql://username:password@localhost:3306/myapp_dev"
-   ```
-4. **Run migrations**: `cd packages/database && pnpm prisma db push`
-
-## Development Workflow
-
-### Getting Started
-
-```bash
-# Generate your project
-npx create-fastify-react-router my-awesome-app
-cd my-awesome-app
-
-# Start development servers
-pnpm dev
-```
+## 🛠️ Development
 
 ### Available Scripts
 
 ```bash
+# Development
 pnpm dev              # Start all development servers
 pnpm build            # Build all packages for production
 pnpm typecheck        # Run TypeScript checks
-pnpm lint             # Lint all code
-pnpm format           # Format all code
+pnpm format           # Format code with Biome
+pnpm lint             # Lint code
+
+# Database
 pnpm db:generate      # Generate Prisma client
-pnpm db:push          # Push schema changes to database
+pnpm db:push          # Push schema to database  
+pnpm db:studio        # Open database browser
 pnpm db:migrate       # Create and run migrations
+pnpm db:reset         # Reset database with fresh data
 ```
 
-### Working with the Database
+### Adding Features
 
+#### New API Endpoint
+```typescript
+// apps/api/src/routes/users.ts
+import type { FastifyPluginAsync } from 'fastify';
+
+const users: FastifyPluginAsync = async (fastify) => {
+  fastify.get('/api/users', async () => {
+    // Your logic here
+    return { users: [] };
+  });
+};
+
+export default users;
+```
+
+#### New Frontend Route
+```tsx
+// apps/web/app/routes/users.tsx
+import type { Route } from "./+types/users";
+
+export async function loader({ request }: Route.LoaderArgs) {
+  // Fetch data from API
+  const users = await fetch('/api/users').then(r => r.json());
+  return { users };
+}
+
+export default function Users({ loaderData }: Route.ComponentProps) {
+  return (
+    <div>
+      <h1>Users</h1>
+      {/* Your component here */}
+    </div>
+  );
+}
+```
+
+#### Database Model
+```prisma
+// packages/database/prisma/schema.prisma
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+After adding models, run:
 ```bash
-# View your data
-cd packages/database
-pnpm prisma studio
-
-# Reset database
-pnpm prisma db push --force-reset
-
-# Create migration
-pnpm prisma migrate dev --name add-user-model
+pnpm db:push  # Development
+# or
+pnpm db:migrate dev --name add-user-model  # Production
 ```
 
-### Adding New Features
+## 🗄️ Database Setup
 
-1. **API Routes** - Add files to `apps/api/src/routes/`
-2. **Frontend Pages** - Add files to `apps/web/app/routes/`
-3. **Database Models** - Edit `packages/database/prisma/schema.prisma`
-4. **Shared Components** - Add to `packages/ui/src/`
-5. **Utilities** - Add to `packages/shared-utils/src/`
+### Development (SQLite - Default)
+No setup required! Database file is created automatically at `data/dev.db`.
 
-## Deployment Guide
+### Production (PostgreSQL)
+1. **Get a PostgreSQL database** (Railway, Supabase, Neon, etc.)
+2. **Update `.env`**:
+   ```env
+   DATABASE_URL="postgresql://user:pass@host:5432/dbname"
+   ```
+3. **Deploy schema**:
+   ```bash
+   pnpm db:push
+   ```
+
+### Production (MySQL)
+1. **Get a MySQL database** (PlanetScale, AWS RDS, etc.)
+2. **Update `.env`**:
+   ```env
+   DATABASE_URL="mysql://user:pass@host:3306/dbname"
+   ```
+3. **Deploy schema**:
+   ```bash
+   pnpm db:push
+   ```
+
+## 🚀 Deployment
 
 ### Vercel (Recommended)
-
-**✅ Zero-config deployment with automatic SSL**
-
 ```bash
-# Install Vercel CLI
 npm i -g vercel
-
-# Deploy
 vercel
-
-# Set environment variables in Vercel dashboard
-# DATABASE_URL=your_production_database_url
+# Add DATABASE_URL in Vercel dashboard
 ```
 
 ### Railway
-
-**✅ Includes managed PostgreSQL database**
-
 ```bash
-# Install Railway CLI
 npm i -g @railway/cli
-
-# Deploy with database
-railway login
-railway init
-railway up
+railway login && railway init && railway up
 ```
 
 ### Docker
-
-**✅ Containerized deployment**
-
-```dockerfile
-# Dockerfile included in generated project
+```bash
 docker build -t my-app .
 docker run -p 3000:3000 my-app
 ```
 
-### Traditional VPS
+## 🎯 Use Cases
 
-**✅ PM2 or systemd deployment**
+This starter is perfect for:
 
-```bash
-# Build for production
-pnpm build
+- **🏢 Business Applications** - CRM, admin panels, dashboards
+- **💰 SaaS Products** - User authentication, billing, multi-tenancy ready
+- **🛒 E-commerce** - Product catalogs, shopping carts, order management
+- **📱 Social Apps** - User profiles, feeds, real-time features
+- **📊 Analytics Dashboards** - Data visualization, reporting tools
+- **🎓 Educational Platforms** - Course management, user progress tracking
 
-# Start with PM2
-pm2 start ecosystem.config.js
+## 🔧 CLI Options
 
-# Or with systemd
-sudo systemctl start my-app
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**❓ Dependencies not installing**
+Generate projects with different configurations:
 
 ```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json pnpm-lock.yaml
-pnpm install
+# Database options
+npx create-fastify-react-router my-app --db postgres
+npx create-fastify-react-router my-app --db mysql
+
+# Linting options  
+npx create-fastify-react-router my-app --lint eslint
+
+# Skip installation
+npx create-fastify-react-router my-app --no-install
 ```
 
-**❓ Database connection errors**
+## 🗺️ Coming Soon
 
-```bash
-# Check your DATABASE_URL in .env
-# Ensure database server is running
-# Run: pnpm prisma db push
-```
+- 🎨 **Tailwind CSS v4** - Modern styling with opt-out option
+- 📁 **Examples Directory** - Authentication, CMS integration, testing setups
+- 🔧 **More CLI Options** - Additional databases, ORMs, and styling solutions
+- 📖 **Advanced Guides** - Deployment, scaling, and production best practices
 
-**❓ TypeScript errors**
+## 🤝 Contributing
 
-```bash
-# Regenerate Prisma client
-cd packages/database
-pnpm prisma generate
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-# Check types
-pnpm typecheck
-```
+This project uses a "living template" approach - improvements here benefit all generated projects.
 
-**❓ Port conflicts**
+## 📚 Learn More
 
-```bash
-# API runs on :3000, Web on :5173
-# Kill existing processes:
-curl http://localhost:3000/api/todos
-lsof -ti:3000 | xargs kill
-```
+- **[Fastify](https://fastify.dev/)** - Web framework for Node.js
+- **[React Router](https://reactrouter.com/)** - Modern React routing
+- **[Prisma](https://prisma.io/)** - Next-generation TypeScript ORM
+- **[Turborepo](https://turbo.build/)** - High-performance build system
 
-### Getting Help
-
-- 🐛 [Report Bugs](https://github.com/jarodtaylor/fastify-react-router-starter/issues)
-- 💡 [Request Features](https://github.com/jarodtaylor/fastify-react-router-starter/issues)
-- 💬 [Discussions](https://github.com/jarodtaylor/fastify-react-router-starter/discussions)
-- 📖 [Wiki](https://github.com/jarodtaylor/fastify-react-router-starter/wiki)
-
-## Migration Guide
-
-### From Express.js
-
-- Routes work similarly - replace `app.get()` with `fastify.get()`
-- Middleware becomes plugins
-- TypeScript support is built-in
-
-### From Next.js
-
-- File-based routing works the same way
-- Replace `getServerSideProps` with React Router 7 loaders
-- API routes move to Fastify backend
-
-### From Create React App
-
-- Add API backend with shared database
-- Monorepo structure improves code organization
-- Better development experience with hot reload
-
-## Learn More
-
-### Documentation
-
-- [Fastify Documentation](https://fastify.dev/) - High-performance web framework
-- [React Router Documentation](https://reactrouter.com/) - Modern React routing
-- [Prisma Documentation](https://prisma.io/docs) - Next-generation ORM
-- [Turborepo Documentation](https://turbo.build/) - Monorepo build system
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-
-### Community
-
-- [Fastify Discord](https://discord.gg/fastify)
-- [React Router Discord](https://discord.gg/reactrouter)
-- [Prisma Discord](https://discord.gg/prisma)
-
-## Contributing
-
-We welcome contributions! This project uses a "living template" approach - improvements to this repository directly benefit all generated projects.
-
-```bash
-git clone https://github.com/jarodtaylor/fastify-react-router-starter.git
-cd fastify-react-router-starter
-pnpm install
-pnpm dev                # Test the template
-./scripts/test-cli-local.sh  # Test CLI generation
-```
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
-
-## License
+## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-## Ready to Build Something Amazing? 🎉
+**Ready to build something amazing?** 🚀
 
 ```bash
-npx create-fastify-react-router my-awesome-app
-cd my-awesome-app
+npx create-fastify-react-router my-app
+cd my-app
 pnpm dev
 ```
-
-**Happy coding!** 🚀
