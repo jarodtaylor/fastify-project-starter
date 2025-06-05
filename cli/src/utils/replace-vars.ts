@@ -285,24 +285,111 @@ async function removePrismaConfig(projectPath: string): Promise<void> {
 			await writeFile(workspaceConfigPath, workspaceContent, "utf-8");
 		}
 
-		// Remove database imports from API if they exist
+		// Remove database dependencies from API package.json
+		const apiPackageJsonPath = join(projectPath, "apps", "api", "package.json");
+		if (existsSync(apiPackageJsonPath)) {
+			const apiPackageContent = await readFile(apiPackageJsonPath, "utf-8");
+			let apiPackageJson: {
+				dependencies?: Record<string, string>;
+				[key: string]: unknown;
+			};
+			try {
+				apiPackageJson = JSON.parse(apiPackageContent) as {
+					dependencies?: Record<string, string>;
+					[key: string]: unknown;
+				};
+			} catch (error) {
+				throw new Error(`Invalid JSON in API package.json: ${error}`);
+			}
+
+			// Remove database dependency using destructuring
+			if (apiPackageJson.dependencies) {
+				// Find and remove any dependency that contains 'database'
+				const dependenciesToRemove = Object.keys(
+					apiPackageJson.dependencies,
+				).filter((dep) => dep.includes("database"));
+
+				for (const dep of dependenciesToRemove) {
+					const { [dep]: _removed, ...remainingDeps } =
+						apiPackageJson.dependencies;
+					apiPackageJson.dependencies = remainingDeps;
+				}
+			}
+
+			await writeFile(
+				apiPackageJsonPath,
+				JSON.stringify(apiPackageJson, null, "\t"),
+				"utf-8",
+			);
+		}
+
+		// Replace API index.ts with database-free version
 		const apiIndexPath = join(projectPath, "apps", "api", "src", "index.ts");
 		if (existsSync(apiIndexPath)) {
-			let apiContent = await readFile(apiIndexPath, "utf-8");
-			// Remove database-related imports with more specific patterns
-			apiContent = apiContent.replace(
-				/import.*from\s+['"]@[^'"]*\/database['"];\n?/g,
-				"",
-			);
-			apiContent = apiContent.replace(
-				/import.*from\s+['"]@prisma\/client['"];\n?/g,
-				"",
-			);
-			apiContent = apiContent.replace(
-				/import.*from\s+['"]\.\.?\/.*database.*['"];\n?/g,
-				"",
-			);
-			await writeFile(apiIndexPath, apiContent, "utf-8");
+			const projectName = projectPath.split("/").pop() || "project";
+			const apiIndexContent = `import {
+	createApiResponse,
+	formatApiError,
+} from "@${projectName}/shared-utils";
+import Fastify from "fastify";
+
+const fastify = Fastify({
+	logger: true,
+});
+
+// Health check endpoint
+fastify.get("/health", async () => {
+	return createApiResponse({ status: "ok" });
+});
+
+// Hello world endpoint
+fastify.get("/api/hello", async (request) => {
+	try {
+		const name = (request.query as { name?: string }).name || "World";
+		const responseData = {
+			message: \`Hello, \${name}!\`,
+			version: "1.0.0",
+		};
+		return createApiResponse(responseData);
+	} catch (error) {
+		return createApiResponse(null, formatApiError(error));
+	}
+});
+
+// Example API endpoint (no database)
+fastify.get("/api/example", async () => {
+	try {
+		const data = {
+			message: "This is an example API endpoint",
+			timestamp: new Date().toISOString(),
+			tip: "Add your own endpoints here!",
+		};
+		return createApiResponse(data);
+	} catch (error) {
+		return createApiResponse(null, formatApiError(error));
+	}
+});
+
+// CORS support for the web app
+fastify.register(import("@fastify/cors"), {
+	origin: ["http://localhost:5173", "http://localhost:3000"], // Common Vite/React dev ports
+	credentials: true,
+});
+
+const start = async () => {
+	try {
+		const port = Number(process.env.PORT) || 3000;
+		await fastify.listen({ port, host: "0.0.0.0" });
+		console.log(\`🚀 API Server ready at http://localhost:\${port}\`);
+	} catch (err) {
+		fastify.log.error(err);
+		process.exit(1);
+	}
+};
+
+start();
+`;
+			await writeFile(apiIndexPath, apiIndexContent, "utf-8");
 		}
 
 		// Remove database-related routes (be specific about file names)
