@@ -14,7 +14,7 @@ fastify-react-router-starter/
 │   ├── template/           # Generated template copy (gitignored)
 │   ├── scripts/            # Build scripts
 │   └── package.json        # CLI package config
-├── DEVELOPMENT.md          # Development progress and architecture
+├── DEVELOPMENT.md          # Development guide (excluded from user projects)
 └── CONTRIBUTING.md         # This file
 ```
 
@@ -305,7 +305,7 @@ pnpm db:push              # Push schema changes
 - Update README.md
 - Improve CLI help text
 - Add deployment guides
-- Update DEVELOPMENT.md
+- Update DEVELOPMENT.md (for contributors)
 
 ## 🔄 Development Workflow
 
@@ -553,7 +553,7 @@ ls packages/database/prisma/        # Check schema files exist
 
 ```bash
 # Update version in cli/package.json
-# Update DEVELOPMENT.md if needed
+# Update DEVELOPMENT.md if needed (contributor documentation)
 # Commit changes
 git add . && git commit -m "feat: description of changes"
 ```
@@ -602,7 +602,7 @@ git push origin main
 
 ### Release Notes
 
-Document in DEVELOPMENT.md:
+Document in DEVELOPMENT.md (for contributors):
 
 - What changed
 - Breaking changes (if any)
