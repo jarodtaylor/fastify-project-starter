@@ -48,14 +48,31 @@ jobs:
       - name: 🏗️ Build CLI
         run: |
           cd packages/create-fastify-project
+          echo "🔨 Building CLI..."
           pnpm build
+
+          echo "📁 Build output verification:"
+          ls -la dist/ || echo "❌ No dist directory created"
+          echo "📄 Files in dist:"
+          find dist/ -type f -name "*.js" 2>/dev/null || echo "❌ No JS files found in dist"
 
       - name: 🧪 Test CLI functionality
         run: |
           cd packages/create-fastify-project
-          # Test version command
-          VERSION_OUTPUT=$(node dist/index.js --version)
-          echo "CLI reports version: $VERSION_OUTPUT"
+
+          # Debug: Check if dist directory and files exist
+          echo "📁 Checking dist directory contents:"
+          ls -la dist/ || echo "❌ dist directory doesn't exist"
+
+          if [ -f "dist/index.js" ]; then
+            echo "✅ dist/index.js exists"
+            # Test version command
+            VERSION_OUTPUT=$(node dist/index.js --version)
+            echo "CLI reports version: $VERSION_OUTPUT"
+          else
+            echo "❌ dist/index.js is missing"
+            exit 1
+          fi
 
           # Test project generation (no install to keep it fast)
           cd /tmp
