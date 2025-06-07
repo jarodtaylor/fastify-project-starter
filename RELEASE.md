@@ -133,6 +133,16 @@ The `.github/workflows/publish.yml` workflow automatically:
 2. Ensure it has "Automation" type and "Publish" permission
 3. Update GitHub secret: Repository Settings → Secrets → Actions → NPM_TOKEN
 
+### **pnpm Version Mismatch**
+
+```
+❌ Multiple versions of pnpm specified:
+  - version 10 in the GitHub Action config with the key "version"
+  - version pnpm@10.11.1 in the package.json with the key "packageManager"
+```
+
+**Fix**: Remove `version:` specification from GitHub Actions workflows. The pnpm action will auto-detect from `package.json`'s `packageManager` field.
+
 ### **CI Failures Before Release**
 
 - Always ensure CI passes before creating release
