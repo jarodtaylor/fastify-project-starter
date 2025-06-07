@@ -11,8 +11,13 @@ We use **GitHub Releases** to trigger automated npm publishing. When you create 
 ### **Prerequisites (One-Time Setup)**
 
 1. **NPM_TOKEN Secret**: Ensure `NPM_TOKEN` is configured in GitHub repository secrets
+
    - Go to: Repository Settings → Secrets → Actions
    - Should contain an npm automation token with publish permissions
+
+2. **Mise (Optional)**: For consistent local development with CI
+   - Install: `curl https://mise.run | sh` or see [mise.jdx.dev](https://mise.jdx.dev)
+   - Use: `mise install` to get the same Node.js/pnpm versions as CI
 
 ### **Release Steps**
 

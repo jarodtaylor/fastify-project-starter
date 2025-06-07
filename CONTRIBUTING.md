@@ -37,6 +37,22 @@ This project uses a **living template** approach:
 - pnpm 10+
 - Git
 
+### Recommended: Tool Version Management
+
+We use [Mise](https://mise.jdx.dev/) to ensure consistent tool versions between local development and CI:
+
+```bash
+# Install Mise (one-time setup)
+curl https://mise.run | sh
+
+# Use exact same versions as CI
+mise install  # Reads from mise.toml
+
+# Alternative: use your system versions (must match CI)
+node --version  # Should be 20.18.1
+pnpm --version  # Should be 10.11.1
+```
+
 ### Initial Setup
 
 ```bash

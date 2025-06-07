@@ -15,14 +15,11 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 📦 Setup tools with Mise
+        uses: jdx/mise-action@v2
         with:
-          node-version: "18"
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
+          install: false # We'll install deps manually for frozen lockfile
+          cache: true
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile

@@ -19,15 +19,11 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 📦 Setup tools with Mise
+        uses: jdx/mise-action@v2
         with:
-          node-version: 20
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          run_install: false
+          install: false # We'll install deps manually for frozen lockfile
+          cache: true
 
       - name: 📥 Install root dependencies
         run: pnpm install --frozen-lockfile
@@ -45,15 +41,11 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 📦 Setup tools with Mise
+        uses: jdx/mise-action@v2
         with:
-          node-version: 20
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          run_install: false
+          install: false # We'll install deps manually for frozen lockfile
+          cache: true
 
       - name: 📥 Install CLI dependencies
         run: |
@@ -88,15 +80,11 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 📦 Setup tools with Mise
+        uses: jdx/mise-action@v2
         with:
-          node-version: 20
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          run_install: false
+          install: false # We'll install deps manually for frozen lockfile
+          cache: true
 
       - name: 📥 Install template dependencies
         run: |
@@ -131,15 +119,11 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 📦 Setup tools with Mise
+        uses: jdx/mise-action@v2
         with:
-          node-version: 20
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          run_install: false
+          install: false # We'll install deps manually for frozen lockfile
+          cache: true
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile

@@ -35,6 +35,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
+          run_install: false
 
       - name: 🧪 Test generated project functionality
         run: |
