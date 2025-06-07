@@ -1,28 +1,27 @@
 {
-  "name": "fastify-react-router-starter",
+  "name": "fastify-project-starter",
   "version": "1.0.0",
-  "description": "A monorepo template for building fullstack applications with Fastify APIs and React Router 7 frontends",
+  "description": "CLI tool and templates for generating Fastify-based fullstack projects",
   "keywords": [
     "fastify",
-    "react-router",
-    "monorepo",
+    "cli",
+    "generator",
     "typescript",
-    "turborepo",
-    "pnpm",
-    "biome",
-    "tailwind",
-    "fullstack",
+    "templates",
+    "react-router",
+    "nextjs",
+    "solidjs",
+    "svelte",
     "starter",
-    "boilerplate",
-    "template"
+    "boilerplate"
   ],
-  "homepage": "https://github.com/jarodtaylor/fastify-react-router-starter#readme",
+  "homepage": "https://github.com/jarodtaylor/fastify-project-starter#readme",
   "bugs": {
-    "url": "https://github.com/jarodtaylor/fastify-react-router-starter/issues"
+    "url": "https://github.com/jarodtaylor/fastify-project-starter/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jarodtaylor/fastify-react-router-starter.git"
+    "url": "https://github.com/jarodtaylor/fastify-project-starter.git"
   },
   "license": "MIT",
   "author": {
@@ -36,33 +35,20 @@
   },
   "packageManager": "pnpm@10.11.1",
   "scripts": {
-    "dev": "turbo dev",
-    "dev:api": "turbo run dev --filter=api",
-    "dev:web": "turbo run dev --filter=web",
-    "build": "turbo build",
-    "build:cli": "cd cli && pnpm build",
-    "start": "turbo run start",
-    "lint": "turbo lint",
+    "dev": "cd packages/cli && pnpm dev",
+    "build": "cd packages/cli && pnpm build",
+    "build:cli": "cd packages/cli && pnpm build",
+    "lint": "biome check",
     "format": "biome check --write",
     "format:check": "biome ci --formatter-enabled=true --linter-enabled=false",
-    "typecheck": "turbo typecheck",
-    "test": "turbo run test",
-    "audit": "pnpm audit",
-    "check": "pnpm format:check && pnpm typecheck",
-    "ci": "biome ci && pnpm typecheck",
-    "db:generate": "cd packages/database && pnpm db:generate",
-    "db:push": "cd packages/database && pnpm db:push",
-    "db:reset": "cd packages/database && pnpm db:reset",
-    "db:studio": "cd packages/database && pnpm db:studio",
-    "db:migrate": "cd packages/database && pnpm db:migrate",
-    "clean": "turbo clean",
+    "typecheck": "cd packages/cli && pnpm typecheck",
     "test:cli": "./scripts/test-cli-local.sh",
-    "test:template": "pnpm typecheck && pnpm build && pnpm format:check",
-    "validate": "pnpm test:template && pnpm test:cli"
+    "test:template": "cd templates/react-router && pnpm typecheck && pnpm build",
+    "validate": "pnpm format:check && pnpm typecheck && pnpm test:cli",
+    "clean": "cd packages/cli && rm -rf dist node_modules"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   }
 }

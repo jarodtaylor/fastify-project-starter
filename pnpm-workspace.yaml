@@ -1,10 +1,2 @@
 packages:
 - "packages/*"
-- "apps/*"
-- "templates/*/packages/*"
-onlyBuiltDependencies:
-- '@biomejs/biome'
-- '@prisma/client'
-- '@prisma/engines'
-- '@tailwindcss/oxide'
-- prisma
