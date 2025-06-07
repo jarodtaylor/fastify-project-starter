@@ -84,6 +84,31 @@ cd packages/create-fastify-project && pnpm build && cd ../..
 
 ## 🔧 **Development Workflow**
 
+### Pre-Commit Validation
+
+**🎯 Always run precheck before committing** to catch issues locally before CI:
+
+```bash
+# Run comprehensive validation (matches CI exactly)
+pnpm precheck
+# OR
+pnpm pre-commit
+
+# This runs:
+# ✅ Format checking
+# ✅ Linting
+# ✅ CLI build validation
+# ✅ Template type checking and building
+# ✅ All validations that CI performs
+```
+
+**Benefits:**
+
+- **Catch issues early** - No more CI format/lint failures
+- **Faster feedback** - Find problems in seconds, not minutes
+- **Confident commits** - Know your changes will pass CI
+- **Same validation as CI** - No surprises
+
 ### Testing Strategy
 
 We use a **layered testing approach** focused on reliability:

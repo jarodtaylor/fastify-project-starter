@@ -42,9 +42,13 @@
     "format": "biome check --write",
     "format:check": "biome ci --formatter-enabled=true --linter-enabled=false",
     "typecheck": "cd packages/create-fastify-project && pnpm typecheck",
+    "typecheck:template": "cd templates/react-router && pnpm typecheck",
+    "build:template": "cd templates/react-router && pnpm build",
     "test:cli": "./scripts/test-cli-local.sh",
     "test:template": "cd templates/react-router && pnpm typecheck && pnpm build",
     "validate": "pnpm format:check && pnpm typecheck && pnpm test:cli",
+    "precheck": "echo '🔍 Running comprehensive pre-commit checks...' && pnpm format:check && pnpm lint && echo '✅ Root format/lint passed' && cd packages/create-fastify-project && pnpm install --frozen-lockfile && pnpm build && echo '✅ CLI build passed' && cd ../../templates/react-router && pnpm install --frozen-lockfile && pnpm typecheck && pnpm build && echo '✅ Template validation passed' && echo '🎉 All precheck validations passed!'",
+    "pre-commit": "pnpm precheck",
     "clean": "cd packages/create-fastify-project && rm -rf dist node_modules"
   },
   "devDependencies": {
