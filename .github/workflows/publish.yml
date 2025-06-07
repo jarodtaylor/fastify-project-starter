@@ -15,9 +15,6 @@ jobs:
 
       - name: 📦 Setup tools with Mise
         uses: jdx/mise-action@v2
-        with:
-          install: false # We'll install deps manually
-          cache: true
 
       - name: 🗃️ Setup npm registry
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc

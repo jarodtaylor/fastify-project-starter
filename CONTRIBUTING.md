@@ -37,21 +37,38 @@ This project uses a **living template** approach:
 - pnpm 10+
 - Git
 
-### Recommended: Tool Version Management
+### Tool Version Management with Mise
 
-We use [Mise](https://mise.jdx.dev/) to ensure consistent tool versions between local development and CI:
+We use [Mise](https://mise.jdx.dev/) to ensure **identical tool versions** across local development, CI, and all team members. This eliminates version mismatch issues that previously caused CI failures.
+
+#### Why Mise?
+
+- **✅ Consistent CI/Local**: Same Node.js/pnpm versions everywhere
+- **✅ Zero configuration**: One command installs correct versions
+- **✅ Team alignment**: All contributors use identical tool versions
+- **✅ Easy updates**: Change versions in one place (`mise.toml`)
+
+#### Setup Options:
+
+**Option 1: Use Mise (Recommended)**
 
 ```bash
 # Install Mise (one-time setup)
 curl https://mise.run | sh
 
-# Use exact same versions as CI
-mise install  # Reads from mise.toml
-
-# Alternative: use your system versions (must match CI)
-node --version  # Should be 20.18.1
-pnpm --version  # Should be 10.11.1
+# Install exact CI versions automatically
+mise install  # Reads versions from mise.toml
 ```
+
+**Option 2: Manual Setup (Advanced)**
+
+```bash
+# Ensure you match CI exactly
+node --version  # Must be 20.18.1
+pnpm --version  # Must be 10.11.1
+```
+
+> **💡 Tip**: If you get CI failures locally but they pass on your machine, version mismatches are likely the cause. Mise eliminates this issue.
 
 ### Initial Setup
 

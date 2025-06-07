@@ -17,9 +17,6 @@ jobs:
 
       - name: 📦 Setup tools with Mise
         uses: jdx/mise-action@v2
-        with:
-          install: false # We'll install deps manually for frozen lockfile
-          cache: true
 
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
