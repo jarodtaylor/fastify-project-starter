@@ -27,7 +27,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10
           run_install: false
 
       - name: 📥 Install root dependencies
@@ -54,7 +53,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10
           run_install: false
 
       - name: 📥 Install CLI dependencies
@@ -98,7 +96,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10
           run_install: false
 
       - name: 📥 Install template dependencies
@@ -142,7 +139,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10
           run_install: false
 
       - name: 📥 Install dependencies
