@@ -44,10 +44,19 @@ A **production-ready starter** that gives you everything needed to build scalabl
 ### Option 1: Use the CLI (Recommended)
 
 ```bash
+# Default setup (SQLite + Prisma + Biome)
 npx create-fastify-react-router my-app
 cd my-app
 pnpm dev
+
+# Or with PostgreSQL for production
+npx create-fastify-react-router my-app --db postgres
+cd my-app
+# Add your DATABASE_URL to .env, then:
+pnpm dev
 ```
+
+> 💡 **See [CLI Options](#-cli-options) below for database, ORM, and linting customization**
 
 ### Option 2: Clone and Fork
 
@@ -245,22 +254,94 @@ This starter is perfect for:
 
 ## 🔧 CLI Options
 
-Generate projects with different configurations:
+The CLI provides flexible options to customize your project generation:
+
+### Basic Usage
 
 ```bash
-# Database options
+# Default setup (SQLite + Prisma + Biome)
+npx create-fastify-react-router my-app
+
+# Custom project name with options
+npx create-fastify-react-router my-app [options]
+```
+
+### Available Options
+
+| Option            | Values                        | Default  | Description                  |
+| ----------------- | ----------------------------- | -------- | ---------------------------- |
+| `--db <database>` | `sqlite`, `postgres`, `mysql` | `sqlite` | Database to use              |
+| `--orm <orm>`     | `prisma`, `none`              | `prisma` | ORM/Database layer           |
+| `--lint <linter>` | `biome`, `eslint`             | `biome`  | Code linting tool            |
+| `--no-install`    | -                             | `false`  | Skip dependency installation |
+| `--no-git`        | -                             | `false`  | Skip git initialization      |
+
+### Examples
+
+```bash
+# PostgreSQL with Prisma (production-ready)
 npx create-fastify-react-router my-app --db postgres
-npx create-fastify-react-router my-app --db mysql
 
-# Linting options
-npx create-fastify-react-router my-app --lint eslint
+# MySQL with ESLint
+npx create-fastify-react-router my-app --db mysql --lint eslint
 
-# Skip installation
-npx create-fastify-react-router my-app --no-install
+# No database/ORM (API only)
+npx create-fastify-react-router my-app --orm none
+
+# Quick generation without dependencies
+npx create-fastify-react-router my-app --no-install --no-git
+
+# Full customization
+npx create-fastify-react-router my-app --db postgres --lint eslint --no-git
+```
+
+### Database Configuration
+
+**SQLite (Default)**
+
+- ✅ Zero setup required
+- ✅ Perfect for development
+- ✅ Database file: `data/dev.db`
+
+**PostgreSQL**
+
+- 🚀 Production-ready
+- 🔒 ACID compliant
+- 📊 Advanced features
+- 🔧 Requires DATABASE_URL
+
+**MySQL**
+
+- 🚀 Production-ready
+- 🌐 Widely supported
+- ⚡ High performance
+- 🔧 Requires DATABASE_URL
+
+### Post-Generation Setup
+
+If you used `--no-install`, run these commands:
+
+```bash
+cd my-app
+pnpm install
+cp .env.example .env
+pnpm db:push  # If using Prisma
+pnpm dev
+```
+
+### Getting Help
+
+```bash
+# View all CLI options and help
+npx create-fastify-react-router --help
+
+# Check CLI version
+npx create-fastify-react-router --version
 ```
 
 ## 🗺️ Coming Soon
 
+- 🧪 **Automated CLI Testing** - Comprehensive test suite for CLI functionality and edge cases
 - 🎨 **Tailwind CSS v4** - Modern styling with opt-out option
 - 📁 **Examples Directory** - Authentication, CMS integration, testing setups
 - 🔧 **More CLI Options** - Additional databases, ORMs, and styling solutions
