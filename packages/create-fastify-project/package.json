@@ -1,6 +1,6 @@
 {
   "name": "create-fastify-project",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "type": "module",
   "description": "CLI tool to generate Fastify + React Router 7 monorepo projects",
   "main": "dist/index.js",
@@ -49,5 +49,9 @@
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },
-  "files": ["dist", "README.md", "template"]
+  "files": [
+    "dist",
+    "README.md",
+    "template"
+  ]
 }
