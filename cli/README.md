@@ -33,6 +33,7 @@ This ensures the template is always up-to-date with the latest project changes.
 ### Core CLI Logic
 
 - **`src/index.ts`** - Main CLI entry point, argument parsing with Commander.js
+  - **Version handling**: Reads version dynamically from `../package.json` to stay in sync
 - **`src/create-project.ts`** - Project creation orchestration and validation
 - **`src/utils/validation.ts`** - Input validation and project name checking
 

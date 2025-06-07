@@ -164,10 +164,12 @@ Our CI is designed for **reliability and speed**:
 ### Release Process
 
 1. Test locally: `./scripts/test-cli-local.sh`
-2. Update version in `cli/package.json`
-3. Create PR with changes
-4. After merge, tag release
-5. Publish CLI to npm
+2. Update version: `cd cli && npm version patch`
+3. **Verify version sync**: `cd cli && pnpm build && node dist/index.js --version`
+4. Create PR with changes
+5. After merge, tag release
+6. Publish CLI: `cd cli && npm publish`
+7. **Verify published**: `npx create-fastify-react-router@latest --version`
 
 ### Best Practices
 

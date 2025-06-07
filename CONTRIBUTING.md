@@ -209,6 +209,31 @@ The CLI provides different error states:
 - ⚠️ **Partial Success**: Project created but needs manual setup
 - ❌ **Failure**: Project creation failed
 
+### Version Synchronization Issues
+
+**Issue**: `npx create-fastify-react-router --version` shows wrong version
+
+```bash
+# Symptoms
+npx create-fastify-react-router@latest --version  # Shows old version like 1.0.0
+# But cli/package.json shows newer version like 1.0.6
+
+# Diagnosis
+cd cli && node dist/index.js --version  # Check local version
+npm view create-fastify-react-router versions --json  # Check published versions
+
+# Cause: Usually one of these:
+# 1. Version hardcoded in cli/src/index.ts instead of reading from package.json
+# 2. New version not actually published to npm
+# 3. npm cache/propagation delay
+
+# Solution:
+# 1. Ensure dynamic version reading (one-time fix):
+grep -n "version.*package.*json" cli/src/index.ts  # Should exist
+# 2. Verify published: npm view create-fastify-react-router version
+# 3. Clear cache: npx clear-npx-cache
+```
+
 Debug error messaging in `cli/src/create-project.ts`:
 
 ```typescript
@@ -549,12 +574,26 @@ ls packages/database/prisma/        # Check schema files exist
 
 ### Publishing CLI Updates
 
+⚠️ **Critical: Version Synchronization**
+
+The CLI version must be kept in sync between `package.json` and the actual published version. The CLI now reads its version dynamically from `package.json`, but you must still follow this checklist:
+
 **Step 1: Prepare Release**
 
 ```bash
-# Update version in cli/package.json
-# Update DEVELOPMENT.md if needed (contributor documentation)
-# Commit changes
+# 1. Update version in cli/package.json
+cd cli
+npm version patch  # or minor/major
+
+# 2. Ensure version is read dynamically (should already be done)
+# Verify cli/src/index.ts reads version from package.json, not hardcoded
+
+# 3. Test version display locally
+pnpm build
+node dist/index.js --version  # Should show new version
+
+# 4. Update DEVELOPMENT.md if needed
+# 5. Commit changes
 git add . && git commit -m "feat: description of changes"
 ```
 
@@ -583,8 +622,19 @@ cd cli && npm publish
 
 ```bash
 cd /tmp
+
+# Wait for npm propagation (can take 1-2 minutes)
+sleep 60
+
+# Test version display
+npx create-fastify-react-router@latest --version  # Should show new version
+
+# Test project generation
 npx create-fastify-react-router@latest test-published --no-install
 ls test-published/packages/  # Verify it works
+
+# Clean up
+rm -rf test-published
 ```
 
 **Step 5: Push to Git**
