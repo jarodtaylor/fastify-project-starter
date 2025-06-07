@@ -249,13 +249,13 @@ pnpm install
 
 ## 🤝 Need Help?
 
-- 📖 **[Full Documentation](https://github.com/jarodtaylor/fastify-react-router-starter)**
-- 🐛 **[Report Issues](https://github.com/jarodtaylor/fastify-react-router-starter/issues)**
-- 💬 **[Discussions](https://github.com/jarodtaylor/fastify-react-router-starter/discussions)**
+- 📖 **[Full Documentation](https://github.com/jarodtaylor/fastify-project-starter)**
+- 🐛 **[Report Issues](https://github.com/jarodtaylor/fastify-project-starter/issues)**
+- 💬 **[Discussions](https://github.com/jarodtaylor/fastify-project-starter/discussions)**
 
 ## 📄 License
 
-MIT License - see [LICENSE](https://github.com/jarodtaylor/fastify-react-router-starter/blob/main/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/jarodtaylor/fastify-project-starter/blob/main/LICENSE) for details.
 
 ---
 
