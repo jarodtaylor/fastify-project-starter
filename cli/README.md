@@ -1,283 +1,268 @@
-# CLI Generator (`create-fastify-react-router`)
+# Create Fastify React Router
 
-This directory contains the CLI generator that creates new projects from the living template. The CLI is published to npm as `create-fastify-react-router`.
+> 🚀 **CLI tool to generate modern fullstack applications with Fastify API + React Router 7 frontend**
 
-## Architecture Overview
+A production-ready starter that scaffolds everything you need to build scalable fullstack applications. Built with TypeScript, modern tooling, and best practices.
 
-The CLI uses a **"living template"** approach:
-
-```mermaid
-graph TD
-    A["Parent Directory<br/>(../apps, ../packages)"] -->|"pnpm build"| B["cli/template/<br/>(copied template)"]
-    B -->|"npx create-*"| C["User Project<br/>(customized copy)"]
-
-    A -.->|"Always in sync"| A1["Active Development<br/>Template changes here"]
-    B -.->|"Build artifact"| B1["Packaged for npm<br/>Excluded from git"]
-    C -.->|"Final output"| C1["Ready-to-use project<br/>Variable replaced"]
-
-    style A fill:#e1f5fe
-    style B fill:#fff3e0
-    style C fill:#e8f5e8
-```
-
-**Flow**:
-
-1. **Template Source**: The parent directory (`../`) serves as the living template
-2. **Build-Time Copy**: During `pnpm build`, the template is copied to `cli/template/`
-3. **Runtime Generation**: When users run the CLI, it copies from `cli/template/` and customizes it
-
-This ensures the template is always up-to-date with the latest project changes.
-
-## Key Files and Responsibilities
-
-### Core CLI Logic
-
-- **`src/index.ts`** - Main CLI entry point, argument parsing with Commander.js
-  - **Version handling**: Reads version dynamically from `../package.json` to stay in sync
-- **`src/create-project.ts`** - Project creation orchestration and validation
-- **`src/utils/validation.ts`** - Input validation and project name checking
-
-### Template Processing
-
-- **`src/utils/copy-template.ts`** - Runtime template copying with exclusions
-- **`src/utils/replace-vars.ts`** - Variable replacement system (project names, scopes)
-- **`src/utils/prompts.ts`** - Interactive prompts for missing options
-
-### Build System
-
-- **`scripts/copy-template.js`** - Build-time template copying for npm packaging
-- **`package.json`** - CLI package configuration and dependencies
-- **`tsconfig.json`** - TypeScript configuration for CLI
-
-### Generated Artifacts
-
-- **`dist/`** - Compiled JavaScript (gitignored)
-- **`template/`** - Copied template files (gitignored, created during build)
-
-## Development Workflow
-
-### Setup
+## ✨ Quick Start
 
 ```bash
-cd cli
+# Create a new project
+npx create-fastify-react-router my-app
+cd my-app
+pnpm dev
+```
+
+**That's it!** Your fullstack application is running:
+
+- 🌐 **Frontend**: http://localhost:5173
+- 🚀 **API**: http://localhost:3000
+- 🗄️ **Database Studio**: `pnpm db:studio`
+
+## 🛠️ CLI Options
+
+### Database Options
+
+```bash
+# SQLite (default - zero setup)
+npx create-fastify-react-router my-app
+
+# PostgreSQL (production-ready)
+npx create-fastify-react-router my-app --db postgres
+
+# MySQL
+npx create-fastify-react-router my-app --db mysql
+```
+
+### Development Options
+
+```bash
+# Skip dependency installation (faster generation)
+npx create-fastify-react-router my-app --no-install
+
+# Skip git initialization
+npx create-fastify-react-router my-app --no-git
+
+# Use ESLint instead of Biome
+npx create-fastify-react-router my-app --lint eslint
+
+# Combine options
+npx create-fastify-react-router my-app --db postgres --lint eslint --no-git
+```
+
+### All Available Options
+
+| Option            | Values                        | Default  | Description                  |
+| ----------------- | ----------------------------- | -------- | ---------------------------- |
+| `--db <database>` | `sqlite`, `postgres`, `mysql` | `sqlite` | Database to use              |
+| `--orm <orm>`     | `prisma`, `none`              | `prisma` | ORM/Database layer           |
+| `--lint <linter>` | `biome`, `eslint`             | `biome`  | Code linting tool            |
+| `--no-install`    | -                             | `false`  | Skip dependency installation |
+| `--no-git`        | -                             | `false`  | Skip git initialization      |
+
+## 📁 What You Get
+
+Your generated project includes:
+
+### 🚀 **High-Performance API** (Fastify)
+
+- TypeScript-first with full type safety
+- 65k+ requests/sec capability (2x faster than Express)
+- Built-in CORS, error handling, and validation
+- Hot reload development experience
+
+### ⚛️ **Modern React Frontend** (React Router 7)
+
+- Server-side rendering (SSR) for SEO
+- File-based routing with nested layouts
+- Optimistic UI updates and form actions
+- Responsive design ready
+
+### 🗄️ **Database Ready** (Prisma ORM)
+
+- SQLite for development, PostgreSQL/MySQL for production
+- Type-safe database queries and migrations
+- Visual database browser with Prisma Studio
+
+### 📦 **Monorepo Architecture** (Turborepo)
+
+- Shared packages for code reuse
+- Optimized build caching and parallelization
+- Independent app scaling and deployment
+
+## 🏗️ Project Structure
+
+```
+my-app/
+├── apps/
+│   ├── api/                 # Fastify API server
+│   └── web/                 # React Router 7 frontend
+├── packages/
+│   ├── database/            # Shared Prisma database
+│   ├── shared-utils/        # Shared utilities
+│   ├── typescript-config/   # Shared TypeScript configs
+│   └── ui/                  # Shared UI components
+├── .env.example             # Environment variables template
+├── package.json             # Root workspace config
+└── turbo.json              # Monorepo build system
+```
+
+## 🚀 Getting Started
+
+### 1. Generate Project
+
+```bash
+npx create-fastify-react-router my-app
+cd my-app
+```
+
+### 2. Environment Setup
+
+If using PostgreSQL or MySQL:
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Add your database URL
+echo 'DATABASE_URL="postgresql://user:pass@host:5432/dbname"' >> .env
+```
+
+### 3. Start Development
+
+```bash
+# Install dependencies (if you used --no-install)
+pnpm install
+
+# Set up database
+pnpm db:push
+
+# Start all development servers
+pnpm dev
+```
+
+## 📊 Available Scripts
+
+```bash
+# Development
+pnpm dev              # Start all development servers
+pnpm build            # Build all packages for production
+pnpm typecheck        # Run TypeScript checks
+
+# Database
+pnpm db:generate      # Generate Prisma client
+pnpm db:push          # Push schema to database
+pnpm db:studio        # Open database browser
+pnpm db:migrate       # Create and run migrations
+
+# Code Quality
+pnpm format           # Format code with Biome/ESLint
+pnpm lint             # Lint code
+```
+
+## 🎯 Perfect For
+
+- **🏢 Business Applications** - CRM, admin panels, dashboards
+- **💰 SaaS Products** - User authentication, billing, multi-tenancy ready
+- **🛒 E-commerce** - Product catalogs, shopping carts, order management
+- **📱 Social Apps** - User profiles, feeds, real-time features
+- **📊 Analytics Dashboards** - Data visualization, reporting tools
+
+## 🗄️ Database Setup
+
+### SQLite (Default)
+
+- ✅ **Zero setup required** - works out of the box
+- ✅ **Perfect for development** and small applications
+- 📁 **Database file**: `data/dev.db`
+
+### PostgreSQL (Recommended for Production)
+
+- 🚀 **Production-ready** with ACID compliance
+- 🔒 **Advanced features** - JSON columns, full-text search
+- 🌐 **Hosted options**: Railway, Supabase, Neon, Vercel Postgres
+
+### MySQL
+
+- 🚀 **Production-ready** with wide ecosystem support
+- ⚡ **High performance** for read-heavy workloads
+- 🌐 **Hosted options**: PlanetScale, AWS RDS, DigitalOcean
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+```bash
+npm i -g vercel
+vercel
+# Add DATABASE_URL in Vercel dashboard
+```
+
+### Railway
+
+```bash
+npm i -g @railway/cli
+railway login && railway init && railway up
+```
+
+### Docker
+
+```bash
+docker build -t my-app .
+docker run -p 3000:3000 my-app
+```
+
+## 🔧 Troubleshooting
+
+### PostgreSQL Setup Issues
+
+If you see database connection errors:
+
+```bash
+# 1. Ensure your database is running
+# 2. Check your DATABASE_URL in .env
+# 3. Try manual setup:
+cd packages/database
+cp .env.example .env
+# Edit .env with your DATABASE_URL
+pnpm prisma generate
+pnpm prisma db push
+```
+
+### Dependencies Installation
+
+If dependencies fail to install:
+
+```bash
+# Clear package manager cache
+pnpm store prune
+rm -rf node_modules
 pnpm install
 ```
 
-### Development Commands
+## 📚 Learn More
+
+- **[Fastify Documentation](https://fastify.dev/)** - Web framework for Node.js
+- **[React Router Documentation](https://reactrouter.com/)** - Modern React routing
+- **[Prisma Documentation](https://prisma.io/)** - Next-generation TypeScript ORM
+- **[Turborepo Documentation](https://turbo.build/)** - High-performance build system
+
+## 🤝 Need Help?
+
+- 📖 **[Full Documentation](https://github.com/jarodtaylor/fastify-react-router-starter)**
+- 🐛 **[Report Issues](https://github.com/jarodtaylor/fastify-react-router-starter/issues)**
+- 💬 **[Discussions](https://github.com/jarodtaylor/fastify-react-router-starter/discussions)**
+
+## 📄 License
+
+MIT License - see [LICENSE](https://github.com/jarodtaylor/fastify-react-router-starter/blob/main/LICENSE) for details.
+
+---
+
+**Ready to build something amazing?** 🚀
 
 ```bash
-# Build CLI (TypeScript + template copy)
-pnpm build
-
-# Development mode (TypeScript compilation only)
+npx create-fastify-react-router my-app
+cd my-app
 pnpm dev
-
-# Type checking
-pnpm typecheck
-
-# Clean build artifacts
-pnpm clean
 ```
-
-### Testing Locally
-
-```bash
-# Build first
-pnpm build
-
-# Test CLI generation
-node dist/index.js test-project --no-install --no-git
-
-# Test with different options
-node dist/index.js test-postgres --db postgres --no-install
-node dist/index.js test-eslint --lint eslint --no-install
-node dist/index.js test-none --orm none --no-install
-
-# Clean up
-rm -rf test-*
-```
-
-## Template Processing System
-
-### Exclusion Patterns
-
-The CLI excludes certain files/directories when copying the template:
-
-```typescript
-const EXCLUDE_PATTERNS = [
-  "node_modules",
-  ".git",
-  "cli", // Build artifacts and self-reference
-  ".turbo",
-  "dist",
-  "build", // Build outputs
-  ".github",
-  "CONTRIBUTING.md", // Development files
-  ".env",
-  ".env.local", // Environment files (only .env.example copied)
-  "**/Dockerfile",
-  "**/.dockerignore", // Docker files
-];
-```
-
-### Variable Replacement
-
-The CLI replaces these template variables throughout the generated project:
-
-```typescript
-const TEMPLATE_VARS = {
-  "fastify-react-router-starter": projectName,
-  "@fastify-react-router-starter": `@${projectName}`,
-  "Jarod Taylor": "Your Name",
-  "jarodrtaylor@gmail.com": "your.email@example.com",
-  // Repository URLs, etc.
-};
-```
-
-**Files processed**: `package.json`, TypeScript files, configuration files, documentation
-
-### Configuration Options
-
-The CLI handles these customization options:
-
-- **Database**: `sqlite` (default), `postgres`, `mysql`
-- **ORM**: `prisma` (default), `none`
-- **Linter**: `biome` (default), `eslint`
-- **Setup**: `--install/--no-install`, `--git/--no-git`
-
-Each option triggers specific template modifications in `replace-vars.ts`.
-
-## Project Validation
-
-The CLI validates generated projects to ensure they're set up correctly:
-
-```typescript
-async function validateProject(projectPath: string, options: ProjectOptions) {
-  // 1. Check if node_modules exists (dependencies installed)
-  // 2. Verify required packages are present
-  // 3. Return validation status
-}
-```
-
-**Validation outcomes**:
-
-- ✅ **Success**: All dependencies installed, ready to use
-- ⚠️ **Partial**: Project created but needs manual setup
-- ❌ **Error**: Project creation failed
-
-## Error Handling
-
-The CLI provides clear error messages and recovery instructions:
-
-- **Invalid inputs**: Clear validation messages with valid options
-- **File system errors**: Graceful handling of permissions, existing directories
-- **Network failures**: Fallback instructions for manual setup
-- **Partial failures**: Step-by-step recovery instructions
-
-## Adding New CLI Options
-
-1. **Update CLI interface** (`src/index.ts`):
-
-   ```typescript
-   .option('--new-option <value>', 'Description', 'default')
-   ```
-
-2. **Add to TypeScript interface** (`src/create-project.ts`):
-
-   ```typescript
-   export interface ProjectOptions {
-     newOption: string;
-   }
-   ```
-
-3. **Handle in processing**:
-   - Add to `promptForOptions()` if needed
-   - Implement logic in `replaceTemplateVars()`
-   - Add validation in `validateProjectOptions()`
-
-## Publishing
-
-The CLI is published to npm as `create-fastify-react-router`:
-
-```bash
-# Build and test locally first
-pnpm build
-node dist/index.js test-publish --no-install --no-git
-
-# Publish to npm
-npm publish
-
-# Test published version
-npx create-fastify-react-router@latest test-published --no-install
-```
-
-## Dependencies
-
-### Runtime Dependencies
-
-- **Commander.js**: CLI argument parsing and help generation
-- **Inquirer**: Interactive prompts for missing options
-- **Ora**: Loading spinners and progress indicators
-- **Chalk**: Colored terminal output
-- **Execa**: Process execution for git, pnpm commands
-
-### Build Dependencies
-
-- **TypeScript**: Type checking and compilation
-- **Node.js built-ins**: File system operations, path manipulation
-
-## Debugging
-
-### Common Issues
-
-**Template not copying correctly**:
-
-```bash
-ls cli/template/packages/  # Should include database, shared-utils, etc.
-```
-
-**Variable replacement not working**:
-
-```bash
-grep -r "fastify-react-router-starter" generated-project/  # Should be minimal
-```
-
-**CLI validation failing**:
-
-```bash
-cd cli && pnpm build  # Rebuild after validation changes
-node dist/index.js test --db invalid  # Test error handling
-```
-
-### Verbose Output
-
-```bash
-# Enable debug output for template copying
-DEBUG=copy-template node dist/index.js test-debug
-
-# Check TypeScript compilation
-pnpm typecheck --verbose
-```
-
-## Testing
-
-See the [Validation Patterns](../CONTRIBUTING.md#validation-patterns-and-workflows) section in CONTRIBUTING.md for comprehensive testing workflows.
-
-### Quick Tests
-
-```bash
-# Input validation
-node dist/index.js test --db invalid    # Should error
-node dist/index.js test --orm none      # Should warn about db option
-
-# Structure validation
-node dist/index.js test --no-install --no-git
-ls test/packages/                       # Should include all packages
-```
-
-## Related Files
-
-- **`../CONTRIBUTING.md`** - Comprehensive development and testing workflows
-- **`../package.json`** - Root project configuration and scripts
-- **`../turbo.json`** - Monorepo build configuration
-- **`../apps/`** and **`../packages/`** - Template source files
