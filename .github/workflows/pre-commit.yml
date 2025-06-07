@@ -68,14 +68,15 @@ jobs:
             exit 1
           fi
 
-          # Check for console.log statements in production files (excluding server startup messages)
-          # Find console.log statements but exclude legitimate server entry files and templates
-          if grep -r "console\.log" packages/cli/ --include="*.ts" --include="*.tsx" 2>/dev/null | \
-             grep -v -E "(.*server\.ts|.*main\.ts)"; then
-            echo "❌ Console.log statements found in CLI files!"
-            echo "ℹ️  Remove debug console.log statements"
-            grep -r "console\.log" packages/cli/ --include="*.ts" --include="*.tsx" 2>/dev/null | \
-              grep -v -E "(.*server\.ts|.*main\.ts)"
+          # Check for console.log statements in production files (excluding CLI and server files)
+          # CLI tools are expected to have console.log for user output, so we skip CLI checks
+          # Only check templates for accidental console.log statements, excluding node_modules and CLI directories
+          if grep -r "console\.log" templates/ --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=cli 2>/dev/null | \
+             grep -v -E "(.*server\.ts|.*main\.ts|.*index\.ts)"; then
+            echo "❌ Console.log statements found in template files!"
+            echo "ℹ️  Remove debug console.log statements (server startup logs are OK)"
+            grep -r "console\.log" templates/ --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=cli 2>/dev/null | \
+              grep -v -E "(.*server\.ts|.*main\.ts|.*index\.ts)"
             exit 1
           fi
 
@@ -88,9 +89,11 @@ jobs:
       - name: 🔍 CLI type check
         run: |
           cd packages/cli
+          pnpm install --frozen-lockfile
           pnpm typecheck
 
       - name: 🔍 Template type check
         run: |
           cd templates/react-router
+          pnpm install --frozen-lockfile
           pnpm typecheck
