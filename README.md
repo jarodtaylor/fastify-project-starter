@@ -85,85 +85,157 @@ Every generated project includes:
 - Optimized build caching and parallelization
 - Independent scaling and deployment strategies
 
-## 🏗️ **Repository Structure**
-
-This repository contains:
+## 📊 **Project Structure**
 
 ```
-fastify-project-starter/
+my-app/
+├── apps/
+│   ├── api/                 # Fastify API server
+│   └── web/                 # React Router 7 frontend
 ├── packages/
-│   └── cli/                 # create-fastify-project CLI tool
-│       ├── src/             # CLI source code
-│       ├── templates/       # Template configurations
-│       └── README.md        # CLI usage documentation
-├── templates/
-│   ├── react-router/        # React Router 7 template
-│   ├── nextjs/             # Next.js template (coming soon)
-│   └── solidjs/            # SolidJS template (coming soon)
-├── scripts/                 # Development and build scripts
-├── ROADMAP.md              # Project roadmap and progress
-├── CONTRIBUTING.md         # Contribution guidelines
-└── README.md               # This file
+│   ├── database/            # Shared Prisma database
+│   ├── shared-utils/        # Shared utilities
+│   ├── typescript-config/   # Shared TypeScript configs
+│   └── ui/                  # Shared UI components
+├── .env.example             # Environment variables template
+├── package.json             # Root workspace config
+└── turbo.json              # Monorepo build system
 ```
 
-## 🚀 **For Users**
+## 🚀 **Getting Started**
 
-**Just want to create a project?** Use the CLI:
+### 1. Generate Project
 
 ```bash
 npx create-fastify-project my-app
 cd my-app
+```
+
+### 2. Environment Setup
+
+If using PostgreSQL or MySQL:
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Add your database URL
+echo 'DATABASE_URL="postgresql://user:pass@host:5432/dbname"' >> .env
+```
+
+### 3. Start Development
+
+```bash
+# Install dependencies (if you used --no-install)
+pnpm install
+
+# Set up database
+pnpm db:push
+
+# Start all development servers
 pnpm dev
 ```
 
-See the [CLI documentation](./packages/create-fastify-project/README.md) for detailed usage and options.
-
-## 👥 **For Contributors**
-
-**Want to contribute?** See our [Contributing Guide](./CONTRIBUTING.md) and [Roadmap](./ROADMAP.md).
-
-### **Quick Development Setup**
+## 📊 **Available Scripts**
 
 ```bash
-git clone https://github.com/jarodtaylor/fastify-project-starter.git
-cd fastify-project-starter
-pnpm install
+# Development
+pnpm dev              # Start all development servers
+pnpm build            # Build all packages for production
+pnpm typecheck        # Run TypeScript checks
 
-# Test the CLI locally
-cd packages/create-fastify-project
-pnpm build
-node dist/index.js test-project --no-install --no-git
+# Database
+pnpm db:generate      # Generate Prisma client
+pnpm db:push          # Push schema to database
+pnpm db:studio        # Open database browser
+pnpm db:migrate       # Create and run migrations
+
+# Code Quality
+pnpm format           # Format code with Biome/ESLint
+pnpm lint             # Lint code
 ```
 
-### **Contributing Templates**
+## 🗄️ **Database Setup**
 
-We welcome new templates! Check our [template development guide](./CONTRIBUTING.md#adding-new-templates) for:
+### SQLite (Default)
 
-- Template structure requirements
-- Testing and validation process
-- Submission guidelines
+- ✅ **Zero setup required** - works out of the box
+- ✅ **Perfect for development** and small applications
+- 📁 **Database file**: `data/dev.db`
 
-## 🎯 **Project Goals**
+### PostgreSQL (Recommended for Production)
 
-1. **🎨 Framework Flexibility** - Support multiple frontend frameworks with consistent APIs
-2. **🚀 Performance First** - Fast development and production builds
-3. **🔧 Developer Experience** - Excellent tooling, clear documentation, minimal setup
-4. **📦 Production Ready** - Real-world patterns, security, and deployment configs
-5. **🌟 Community Driven** - Open source with active community contributions
+- 🚀 **Production-ready** with ACID compliance
+- 🔒 **Advanced features** - JSON columns, full-text search
+- 🌐 **Hosted options**: Railway, Supabase, Neon, Vercel Postgres
 
-## 📊 **Success Metrics**
+### MySQL
 
-- **Templates**: 5+ stable frontend framework options
-- **Adoption**: 10,000+ weekly npm downloads
-- **Community**: Active contributors and template marketplace
-- **Quality**: Zero critical issues, comprehensive testing
+- 🚀 **Production-ready** with wide ecosystem support
+- ⚡ **High performance** for read-heavy workloads
+- 🌐 **Hosted options**: PlanetScale, AWS RDS, DigitalOcean
+
+## 🚀 **Deployment**
+
+### Vercel (Recommended)
+
+```bash
+npm i -g vercel
+vercel
+# Add DATABASE_URL in Vercel dashboard
+```
+
+### Railway
+
+```bash
+npm i -g @railway/cli
+railway login && railway init && railway up
+```
+
+### Docker
+
+```bash
+docker build -t my-app .
+docker run -p 3000:3000 my-app
+```
+
+## 🎯 **Perfect For**
+
+- **🏢 Business Applications** - CRM, admin panels, dashboards
+- **💰 SaaS Products** - User authentication, billing, multi-tenancy ready
+- **🛒 E-commerce** - Product catalogs, shopping carts, order management
+- **📱 Social Apps** - User profiles, feeds, real-time features
+- **📊 Analytics Dashboards** - Data visualization, reporting tools
+
+## 🔧 **Troubleshooting**
+
+### PostgreSQL Setup Issues
+
+If you see database connection errors:
+
+```bash
+# 1. Ensure your database is running
+# 2. Check your DATABASE_URL in .env
+# 3. Try manual setup:
+cd packages/database
+cp .env.example .env
+# Edit .env with your DATABASE_URL
+pnpm prisma generate
+pnpm prisma db push
+```
+
+### Dependencies Installation
+
+If dependencies fail to install:
+
+```bash
+# Clear package manager cache
+pnpm store prune
+rm -rf node_modules
+pnpm install
+```
 
 ## 📚 **Learn More**
-
-- **[CLI Documentation](./packages/create-fastify-project/README.md)** - Detailed CLI usage and options
-- **[Roadmap](./ROADMAP.md)** - Project direction and upcoming features
-- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute code and templates
-- **[Development Guide](./DEVELOPMENT.md)** - Local development setup
 
 ### **Framework Documentation**
 
@@ -172,12 +244,12 @@ We welcome new templates! Check our [template development guide](./CONTRIBUTING.
 - **[Prisma](https://prisma.io/)** - Next-generation TypeScript ORM
 - **[Turborepo](https://turbo.build/)** - High-performance build system
 
-## 🤝 **Community**
+### **Project Resources**
 
-- 📖 **[Documentation](https://github.com/jarodtaylor/fastify-project-starter)**
+- **[Roadmap](./ROADMAP.md)** - Project direction and upcoming features
+- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute templates and improvements
 - 🐛 **[Report Issues](https://github.com/jarodtaylor/fastify-project-starter/issues)**
 - 💬 **[Discussions](https://github.com/jarodtaylor/fastify-project-starter/discussions)**
-- 🚀 **[Feature Requests](https://github.com/jarodtaylor/fastify-project-starter/issues/new?template=feature_request.md)**
 
 ## 📄 **License**
 
