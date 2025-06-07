@@ -35,17 +35,17 @@
   },
   "packageManager": "pnpm@10.11.1",
   "scripts": {
-    "dev": "cd packages/cli && pnpm dev",
-    "build": "cd packages/cli && pnpm build",
-    "build:cli": "cd packages/cli && pnpm build",
+    "dev": "cd packages/create-fastify-project && pnpm dev",
+    "build": "cd packages/create-fastify-project && pnpm build",
+    "build:cli": "cd packages/create-fastify-project && pnpm build",
     "lint": "biome check",
     "format": "biome check --write",
     "format:check": "biome ci --formatter-enabled=true --linter-enabled=false",
-    "typecheck": "cd packages/cli && pnpm typecheck",
+    "typecheck": "cd packages/create-fastify-project && pnpm typecheck",
     "test:cli": "./scripts/test-cli-local.sh",
     "test:template": "cd templates/react-router && pnpm typecheck && pnpm build",
     "validate": "pnpm format:check && pnpm typecheck && pnpm test:cli",
-    "clean": "cd packages/cli && rm -rf dist node_modules"
+    "clean": "cd packages/create-fastify-project && rm -rf dist node_modules"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

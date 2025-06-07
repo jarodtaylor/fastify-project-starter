@@ -41,7 +41,7 @@ We're transitioning from a single-template CLI (`create-fastify-react-router`) t
 
 - [x] **Repository Rename** - `fastify-react-router-starter` → `fastify-project-starter`
 - [x] **Directory Structure** - Created `packages/` and `templates/` directories
-- [x] **CLI Migration** - Moved CLI from root `cli/` to `packages/cli/`
+- [x] **CLI Migration** - Moved CLI from root `cli/` to `packages/create-fastify-project/`
 - [x] **Template Extraction** - Moved current template to `templates/react-router/`
 - [ ] **CLI Package Rename** - Update from `create-fastify-react-router` to `create-fastify-project`
 - [ ] **Template System** - Implement CLI logic to select and use templates
@@ -75,7 +75,7 @@ We're transitioning from a single-template CLI (`create-fastify-react-router`) t
 ### **📖 Documentation Updates**
 
 - [ ] **README Overhaul** - Update root README for multi-template approach
-- [ ] **CLI Documentation** - Update packages/cli/README.md with new usage
+- [ ] **CLI Documentation** - Update packages/create-fastify-project/README.md with new usage
 - [ ] **Template READMEs** - Create template-specific documentation
 - [ ] **Migration Guide** - Help existing users transition from old CLI
 

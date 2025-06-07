@@ -116,7 +116,7 @@ cd my-app
 pnpm dev
 ```
 
-See the [CLI documentation](./packages/cli/README.md) for detailed usage and options.
+See the [CLI documentation](./packages/create-fastify-project/README.md) for detailed usage and options.
 
 ## 👥 **For Contributors**
 
@@ -130,7 +130,7 @@ cd fastify-project-starter
 pnpm install
 
 # Test the CLI locally
-cd packages/cli
+cd packages/create-fastify-project
 pnpm build
 node dist/index.js test-project --no-install --no-git
 ```
@@ -160,7 +160,7 @@ We welcome new templates! Check our [template development guide](./CONTRIBUTING.
 
 ## 📚 **Learn More**
 
-- **[CLI Documentation](./packages/cli/README.md)** - Detailed CLI usage and options
+- **[CLI Documentation](./packages/create-fastify-project/README.md)** - Detailed CLI usage and options
 - **[Roadmap](./ROADMAP.md)** - Project direction and upcoming features
 - **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute code and templates
 - **[Development Guide](./DEVELOPMENT.md)** - Local development setup

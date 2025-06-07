@@ -59,17 +59,17 @@ jobs:
 
       - name: 📥 Install CLI dependencies
         run: |
-          cd packages/cli
+          cd packages/create-fastify-project
           pnpm install --frozen-lockfile
 
       - name: 🏗️ Build CLI
         run: |
-          cd packages/cli
+          cd packages/create-fastify-project
           pnpm build
 
       - name: 🧪 CLI Unit Tests
         run: |
-          cd packages/cli
+          cd packages/create-fastify-project
           # Test CLI help and version (no project generation)
           node dist/index.js --help
           node dist/index.js --version
@@ -150,7 +150,7 @@ jobs:
 
       - name: 🔒 Security Audit (CLI)
         run: |
-          cd packages/cli
+          cd packages/create-fastify-project
           pnpm audit --audit-level moderate
 
       - name: 🔒 Security Audit (Template)
