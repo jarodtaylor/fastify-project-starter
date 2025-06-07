@@ -248,6 +248,7 @@ pnpm install
 
 - **[Roadmap](./ROADMAP.md)** - Project direction and upcoming features
 - **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute templates and improvements
+- **[Release Process](./RELEASE.md)** - How to publish new versions (maintainers)
 - 🐛 **[Report Issues](https://github.com/jarodtaylor/fastify-project-starter/issues)**
 - 💬 **[Discussions](https://github.com/jarodtaylor/fastify-project-starter/discussions)**
 
