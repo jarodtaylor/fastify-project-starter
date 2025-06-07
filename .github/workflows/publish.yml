@@ -27,13 +27,13 @@ jobs:
       - name: 📚 Install dependencies
         run: |
           pnpm install
-          cd cli && pnpm install
+          cd packages/cli && pnpm install
 
       - name: 🔍 Validate version sync
         run: |
           # Extract version from git tag (v1.2.3 -> 1.2.3)
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          CLI_VERSION=$(cd cli && node -p "require('./package.json').version")
+          CLI_VERSION=$(cd packages/cli && node -p "require('./package.json').version")
 
           if [ "$TAG_VERSION" != "$CLI_VERSION" ]; then
             echo "❌ Version mismatch: Git tag is v$TAG_VERSION but CLI package.json is $CLI_VERSION"
@@ -44,19 +44,19 @@ jobs:
 
       - name: 🏗️ Build CLI
         run: |
-          cd cli
+          cd packages/cli
           pnpm build
 
       - name: 🧪 Test CLI functionality
         run: |
-          cd cli
+          cd packages/cli
           # Test version command
           VERSION_OUTPUT=$(node dist/index.js --version)
           echo "CLI reports version: $VERSION_OUTPUT"
 
           # Test project generation (no install to keep it fast)
           cd /tmp
-          node /github/workspace/cli/dist/index.js test-ci-publish --no-install --no-git
+          node /github/workspace/packages/cli/dist/index.js test-ci-publish --no-install --no-git
 
           # Verify structure
           if [ ! -d "test-ci-publish/packages/database" ]; then
@@ -68,7 +68,7 @@ jobs:
 
       - name: 📦 Publish to npm
         run: |
-          cd cli
+          cd packages/cli
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -79,7 +79,7 @@ jobs:
           sleep 30
 
           # Check published version
-          PUBLISHED_VERSION=$(npm view create-fastify-react-router version)
+          PUBLISHED_VERSION=$(npm view create-fastify-project version)
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
 
           if [ "$PUBLISHED_VERSION" != "$TAG_VERSION" ]; then

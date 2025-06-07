@@ -37,7 +37,7 @@ function shouldExclude(filename, fullPath) {
     if (pattern.includes("**")) {
       if (fullPath) {
         const regex = new RegExp(
-          pattern.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*")
+          pattern.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*"),
         );
         return regex.test(fullPath);
       }

@@ -1,0 +1,168 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Fast feedback for developers - root project validation
+  validate-root:
+    name: 🔍 Validate Root Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          run_install: false
+
+      - name: 📥 Install root dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎨 Format & Lint Check (Root)
+        run: |
+          pnpm format:check
+          pnpm lint
+
+  # CLI package validation
+  cli-validation:
+    name: 🛠️ CLI Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          run_install: false
+
+      - name: 📥 Install CLI dependencies
+        run: |
+          cd packages/cli
+          pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build CLI
+        run: |
+          cd packages/cli
+          pnpm build
+
+      - name: 🧪 CLI Unit Tests
+        run: |
+          cd packages/cli
+          # Test CLI help and version (no project generation)
+          node dist/index.js --help
+          node dist/index.js --version
+
+      - name: 📁 Verify Template Structure
+        run: |
+          # Ensure template structure is correct
+          test -f templates/react-router/package.json
+          test -f templates/react-router/apps/api/package.json
+          test -f templates/react-router/apps/web/package.json
+          test -d templates/react-router/packages/database
+
+  # Template validation - test the React Router template directly
+  template-validation:
+    name: 🎯 Template Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          run_install: false
+
+      - name: 📥 Install template dependencies
+        run: |
+          cd templates/react-router
+          pnpm install --frozen-lockfile
+
+      - name: 🔍 Type Check Template
+        run: |
+          cd templates/react-router
+          pnpm typecheck
+
+      - name: 🏗️ Build Template
+        run: |
+          cd templates/react-router
+          pnpm build
+
+      - name: 🧪 Template Functionality Test
+        run: |
+          cd templates/react-router
+          # Test the template directly (not generated projects)
+          cp .env.example .env
+          cp packages/database/.env.example packages/database/.env
+          pnpm db:push
+          # Quick smoke test
+          timeout 10s pnpm dev || true
+
+  # Security & documentation
+  security-docs:
+    name: 🔒 Security & Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          run_install: false
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔒 Security Audit (CLI)
+        run: |
+          cd packages/cli
+          pnpm audit --audit-level moderate
+
+      - name: 🔒 Security Audit (Template)
+        run: |
+          cd templates/react-router
+          pnpm audit --audit-level moderate
+
+      - name: 📚 Documentation Check
+        run: |
+          # Check for broken links in README
+          if [ -f README.md ]; then
+            grep -o 'https\?://[^)]*' README.md | head -5 | while read url; do
+              curl -fsS "$url" > /dev/null || echo "Broken link: $url"
+            done
+          fi

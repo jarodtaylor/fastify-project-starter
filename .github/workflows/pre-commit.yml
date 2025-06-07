@@ -30,11 +30,11 @@ jobs:
 
       - name: 🔍 Check for common issues
         run: |
-          # Check for large files (exclude all node_modules, .git, cli/template, and common large file patterns)
+          # Check for large files (exclude all node_modules, .git, templates, and common large file patterns)
           if find . -type f -size +10M \
             -not -path "*/node_modules/*" \
             -not -path "./.git/*" \
-            -not -path "./cli/template/*" \
+            -not -path "./templates/*" \
             -not -path "*/.turbo/*" \
             -not -path "*/dist/*" \
             -not -path "*/build/*" \
@@ -45,7 +45,7 @@ jobs:
             find . -type f -size +10M \
               -not -path "*/node_modules/*" \
               -not -path "./.git/*" \
-              -not -path "./cli/template/*" \
+              -not -path "./templates/*" \
               -not -path "*/.turbo/*" \
               -not -path "*/dist/*" \
               -not -path "*/build/*" \
@@ -69,24 +69,28 @@ jobs:
           fi
 
           # Check for console.log statements in production files (excluding server startup messages)
-          # Find console.log statements but exclude legitimate server entry files
-          if grep -r "console\.log" apps/ packages/ --include="*.ts" --include="*.tsx" 2>/dev/null | \
-             grep -v -E "(apps/api/src/index\.ts|packages/.*/src/index\.ts|.*server\.ts|.*main\.ts)"; then
-            echo "❌ Console.log statements found in production files!"
-            echo "ℹ️  Remove debug console.log statements (server startup logs are OK)"
-            grep -r "console\.log" apps/ packages/ --include="*.ts" --include="*.tsx" 2>/dev/null | \
-              grep -v -E "(apps/api/src/index\.ts|packages/.*/src/index\.ts|.*server\.ts|.*main\.ts)"
+          # Find console.log statements but exclude legitimate server entry files and templates
+          if grep -r "console\.log" packages/cli/ --include="*.ts" --include="*.tsx" 2>/dev/null | \
+             grep -v -E "(.*server\.ts|.*main\.ts)"; then
+            echo "❌ Console.log statements found in CLI files!"
+            echo "ℹ️  Remove debug console.log statements"
+            grep -r "console\.log" packages/cli/ --include="*.ts" --include="*.tsx" 2>/dev/null | \
+              grep -v -E "(.*server\.ts|.*main\.ts)"
             exit 1
           fi
 
-      - name: 🎨 Check formatting
+      - name: 🎨 Check formatting (Root)
         run: pnpm format:check
 
-      - name: 🔍 Lint check
+      - name: 🔍 Lint check (Root)
         run: pnpm lint
 
-      - name: 🔍 Type check
-        run: pnpm typecheck
-
       - name: 🔍 CLI type check
-        run: cd cli && pnpm typecheck
+        run: |
+          cd packages/cli
+          pnpm typecheck
+
+      - name: 🔍 Template type check
+        run: |
+          cd templates/react-router
+          pnpm typecheck

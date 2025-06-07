@@ -25,7 +25,7 @@ jobs:
           cd /tmp
 
           # Test CLI can be installed and run
-          npx create-fastify-react-router@latest test-published --no-git
+          npx create-fastify-project@latest test-published --no-git
 
           # Verify project structure
           cd test-published

@@ -28,14 +28,20 @@ jobs:
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🔍 Check for outdated dependencies (main project)
+      - name: 🔍 Check for outdated dependencies (Root)
         run: pnpm outdated || true
 
       - name: 🔍 Check for outdated dependencies (CLI)
-        run: cd cli && pnpm outdated || true
+        run: cd packages/cli && pnpm outdated || true
 
-      - name: 🔒 Security audit (main project)
+      - name: 🔍 Check for outdated dependencies (Template)
+        run: cd templates/react-router && pnpm outdated || true
+
+      - name: 🔒 Security audit (Root)
         run: pnpm audit --audit-level high
 
       - name: 🔒 Security audit (CLI)
-        run: cd cli && pnpm audit --audit-level high
+        run: cd packages/cli && pnpm audit --audit-level high
+
+      - name: 🔒 Security audit (Template)
+        run: cd templates/react-router && pnpm audit --audit-level high

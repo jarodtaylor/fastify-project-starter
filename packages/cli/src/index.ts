@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import { Command } from "commander";
-import { readFileSync } from "node:fs";
-import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { createProject } from "./create-project.js";
 import { validateProjectName } from "./utils/validation.js";
 
@@ -17,7 +17,7 @@ const version = packageJson.version;
 const program = new Command();
 
 program
-  .name("create-fastify-react-router")
+  .name("create-fastify-project")
   .description("Create a new Fastify + React Router 7 monorepo project")
   .version(version)
   .argument("[project-name]", "Name of the project to create")
@@ -32,7 +32,7 @@ program
   .option("--lint <linter>", "Linter to use (biome, eslint)", "biome")
   .action(async (projectName, options) => {
     try {
-      console.log(chalk.blue.bold("🚀 Create Fastify React Router App"));
+      console.log(chalk.blue.bold("🚀 Create Fastify Project"));
       console.log(
         chalk.gray(
           "A modern monorepo template with Fastify API + React Router 7 frontend\n"
