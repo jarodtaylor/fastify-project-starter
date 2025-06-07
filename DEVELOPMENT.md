@@ -161,15 +161,23 @@ Our CI is designed for **reliability and speed**:
 - **CLI generation speed**: Optimize file copying and template processing
 - **Build time**: Monitor bundle sizes and build performance
 
-### Release Process
+### Release Process (Maintainers Only)
 
-1. Test locally: `./scripts/test-cli-local.sh`
+> **📝 Contributors**: You don't need to worry about releases! Just submit PRs with your changes.
+
+**Automated Release Workflow:**
+
+1. Merge contributor PRs
 2. Update version: `cd cli && npm version patch`
-3. **Verify version sync**: `cd cli && pnpm build && node dist/index.js --version`
-4. Create PR with changes
-5. After merge, tag release
-6. Publish CLI: `cd cli && npm publish`
-7. **Verify published**: `npx create-fastify-react-router@latest --version`
+3. Commit and push version bump
+4. Create GitHub Release with tag `vX.Y.Z`
+5. GitHub Actions automatically publishes to npm
+
+**Manual Verification:**
+
+- Test locally: `./scripts/test-cli-local.sh`
+- **Verify version sync**: `cd cli && pnpm build && node dist/index.js --version`
+- **Verify published**: `npx create-fastify-react-router@latest --version`
 
 ### Best Practices
 

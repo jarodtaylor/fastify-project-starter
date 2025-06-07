@@ -1,0 +1,90 @@
+name: 📦 Publish CLI to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      - name: 🗃️ Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 📚 Install dependencies
+        run: |
+          pnpm install
+          cd cli && pnpm install
+
+      - name: 🔍 Validate version sync
+        run: |
+          # Extract version from git tag (v1.2.3 -> 1.2.3)
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          CLI_VERSION=$(cd cli && node -p "require('./package.json').version")
+
+          if [ "$TAG_VERSION" != "$CLI_VERSION" ]; then
+            echo "❌ Version mismatch: Git tag is v$TAG_VERSION but CLI package.json is $CLI_VERSION"
+            exit 1
+          fi
+
+          echo "✅ Version sync confirmed: $TAG_VERSION"
+
+      - name: 🏗️ Build CLI
+        run: |
+          cd cli
+          pnpm build
+
+      - name: 🧪 Test CLI functionality
+        run: |
+          cd cli
+          # Test version command
+          VERSION_OUTPUT=$(node dist/index.js --version)
+          echo "CLI reports version: $VERSION_OUTPUT"
+
+          # Test project generation (no install to keep it fast)
+          cd /tmp
+          node /github/workspace/cli/dist/index.js test-ci-publish --no-install --no-git
+
+          # Verify structure
+          if [ ! -d "test-ci-publish/packages/database" ]; then
+            echo "❌ Generated project missing database package"
+            exit 1
+          fi
+
+          echo "✅ CLI functionality test passed"
+
+      - name: 📦 Publish to npm
+        run: |
+          cd cli
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: ✅ Verify published version
+        run: |
+          # Wait for npm propagation
+          sleep 30
+
+          # Check published version
+          PUBLISHED_VERSION=$(npm view create-fastify-react-router version)
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+
+          if [ "$PUBLISHED_VERSION" != "$TAG_VERSION" ]; then
+            echo "⚠️ Warning: Published version $PUBLISHED_VERSION doesn't match tag $TAG_VERSION"
+            echo "This might be due to npm propagation delay"
+          else
+            echo "✅ Successfully published version $PUBLISHED_VERSION to npm"
+          fi

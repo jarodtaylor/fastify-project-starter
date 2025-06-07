@@ -334,15 +334,21 @@ pnpm db:push              # Push schema changes
 
 ## 🔄 Development Workflow
 
-### Making Changes
+### For Contributors (External Developers)
 
 1. **Fork and clone** the repository
 2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
 3. **Make your changes** (template and/or CLI)
 4. **Test thoroughly** (see testing sections above)
-5. **Update version** if needed: `cli/package.json`
+5. **❌ Do NOT update version** - maintainers handle versioning
 6. **Commit and push**: `git commit -m "feat: add amazing feature"`
-7. **Open a Pull Request**
+7. **Open a Pull Request** - maintainers will review and merge
+
+> **📝 Note**: Contributors **do not** handle versioning, publishing, or releases. Focus on the feature/fix, maintainers handle the rest!
+
+### For Maintainers (Repository Owners)
+
+After merging contributor PRs, follow the [Publishing and Release Process](#-publishing-and-release-process) above.
 
 ### Testing Checklist
 
@@ -572,9 +578,30 @@ ls packages/database/prisma/        # Check schema files exist
 
 ## 🚀 Publishing and Release Process
 
-### Publishing CLI Updates
+> **👥 Note**: This section is for **maintainers only**. Contributors submit PRs, maintainers handle releases and publishing.
 
-⚠️ **Critical: Version Synchronization**
+### Automated Publishing (Recommended)
+
+We use GitHub Actions to automatically publish to npm when releases are created. This eliminates manual errors and version sync issues.
+
+**Maintainer Release Workflow:**
+
+1. **Review and merge** contributor PRs
+2. **Update CLI version**: `cd cli && npm version patch` (or minor/major)
+3. **Commit version bump**: `git add . && git commit -m "chore: bump CLI version to X.Y.Z"`
+4. **Push changes**: `git push`
+5. **Create GitHub Release**: Go to Releases → Draft new release → Create tag `vX.Y.Z`
+6. **Publish Release**: GitHub Actions automatically publishes to npm
+
+**One-time Setup for Automated Publishing:**
+
+1. **Get npm token**: `npm login` then `npm token create --type=granular --scope=@your-scope`
+2. **Add to GitHub**: Repository Settings → Secrets → Actions → Add `NPM_TOKEN`
+3. **Verify workflow**: `.github/workflows/publish.yml` should exist
+
+### Manual Publishing (Fallback)
+
+⚠️ **Only use if automated publishing fails**
 
 The CLI version must be kept in sync between `package.json` and the actual published version. The CLI now reads its version dynamically from `package.json`, but you must still follow this checklist:
 
