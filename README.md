@@ -29,10 +29,13 @@ pnpm dev
 | `svelte`       | Svelte + SvelteKit + Server-side rendering  | 🚧 **Coming Soon** |
 
 ```bash
-# Use specific template (when available)
+# Currently only React Router is available
+npx create-fastify-project my-app
 npx create-fastify-project my-app --template react-router
-npx create-fastify-project my-app --template nextjs
-npx create-fastify-project my-app --template solidjs
+
+# Coming soon:
+# npx create-fastify-project my-app --template nextjs
+# npx create-fastify-project my-app --template solidjs
 ```
 
 ## 🛠️ **CLI Options**
