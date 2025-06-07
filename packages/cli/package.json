@@ -1,0 +1,57 @@
+{
+  "name": "create-fastify-project",
+  "version": "1.0.7",
+  "type": "module",
+  "description": "CLI tool to generate Fastify + React Router 7 monorepo projects",
+  "main": "dist/index.js",
+  "bin": {
+    "create-fastify-project": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && npm run copy-template",
+    "copy-template": "node scripts/copy-template.js",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "fastify",
+    "react-router",
+    "monorepo",
+    "typescript",
+    "cli",
+    "generator",
+    "starter",
+    "template",
+    "boilerplate"
+  ],
+  "author": "Jarod Taylor",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "inquirer": "^12.0.0",
+    "chalk": "^5.4.1",
+    "ora": "^8.1.0",
+    "fs-extra": "^11.2.0",
+    "ejs": "^3.1.10",
+    "execa": "^9.5.1",
+    "validate-npm-package-name": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "@types/fs-extra": "^11.0.4",
+    "@types/ejs": "^3.1.5",
+    "@types/inquirer": "^9.0.7",
+    "@types/validate-npm-package-name": "^4.0.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "template"
+  ]
+}

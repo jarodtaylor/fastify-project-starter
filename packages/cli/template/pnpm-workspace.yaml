@@ -1,7 +1,7 @@
 packages:
-- "packages/*"
-- "apps/*"
-- "templates/*/packages/*"
+- apps/*
+- packages/*
+- cli
 onlyBuiltDependencies:
 - '@biomejs/biome'
 - '@prisma/client'

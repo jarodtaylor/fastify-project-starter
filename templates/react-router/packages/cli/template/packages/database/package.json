@@ -1,0 +1,23 @@
+{
+  "name": "@fastify-react-router-starter/database",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx src/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.2.2",
+    "tsx": "^4.19.4"
+  },
+  "files": ["src", "prisma"]
+}
