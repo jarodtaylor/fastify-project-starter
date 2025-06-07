@@ -261,6 +261,7 @@ npx create-fastify-react-router my-app --no-install
 
 ## 🗺️ Coming Soon
 
+- 🧪 **Automated CLI Testing** - Comprehensive test suite for CLI functionality and edge cases
 - 🎨 **Tailwind CSS v4** - Modern styling with opt-out option
 - 📁 **Examples Directory** - Authentication, CMS integration, testing setups
 - 🔧 **More CLI Options** - Additional databases, ORMs, and styling solutions
