@@ -37,7 +37,7 @@ function shouldExclude(filename, fullPath) {
     if (pattern.includes("**")) {
       if (fullPath) {
         const regex = new RegExp(
-          pattern.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*"),
+          pattern.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*")
         );
         return regex.test(fullPath);
       }
@@ -82,12 +82,12 @@ function copyRecursive(src, dest, basePath = "") {
   }
 }
 
-// Copy from parent directory to template directory
-const projectRoot = path.resolve(__dirname, "../..");
+// Copy from react-router template to CLI template directory
+const templateSrc = path.resolve(__dirname, "../../../templates/react-router");
 const templateDest = path.resolve(__dirname, "../template");
 
 console.log("Copying template files...");
-console.log(`From: ${projectRoot}`);
+console.log(`From: ${templateSrc}`);
 console.log(`To: ${templateDest}`);
 
 // Clean existing template directory
@@ -95,7 +95,7 @@ if (fs.existsSync(templateDest)) {
   fs.rmSync(templateDest, { recursive: true });
 }
 
-copyRecursive(projectRoot, templateDest);
+copyRecursive(templateSrc, templateDest);
 
 // Ensure data directory exists with .gitkeep
 const dataDir = path.join(templateDest, "data");
