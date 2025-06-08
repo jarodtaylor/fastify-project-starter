@@ -67,7 +67,7 @@ fastify.patch<{ Params: { id: string } }>(
     } catch (error) {
       return createApiResponse(null, formatApiError(error));
     }
-  }
+  },
 );
 
 fastify.delete<{ Params: { id: string } }>(
@@ -80,7 +80,7 @@ fastify.delete<{ Params: { id: string } }>(
     } catch (error) {
       return createApiResponse(null, formatApiError(error));
     }
-  }
+  },
 );
 
 // CORS support for the web app

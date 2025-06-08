@@ -1,7 +1,3 @@
 [tools]
 node = "20.18.1"  # Latest LTS
 pnpm = "10.11.1"  # From your package.json packageManager field
-
-[env]
-# Optional: Set environment variables if needed
-PNPM_HOME = "$HOME/.local/share/pnpm" 

@@ -19,8 +19,5 @@
     "prisma": "^6.2.2",
     "tsx": "^4.19.4"
   },
-  "files": [
-    "src",
-    "prisma"
-  ]
+  "files": ["src", "prisma"]
 }
