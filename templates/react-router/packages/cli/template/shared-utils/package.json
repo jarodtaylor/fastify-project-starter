@@ -1,5 +1,5 @@
 {
-  "name": "@fastify-react-router-starter/shared-utils",
+  "name": "@fastify-project-starter/shared-utils",
   "version": "1.0.0",
   "main": "src/index.ts",
   "exports": {

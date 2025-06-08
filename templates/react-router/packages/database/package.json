@@ -1,5 +1,5 @@
 {
-  "name": "@fastify-react-router-starter/database",
+  "name": "@fastify-project-starter/database",
   "version": "1.0.0",
   "main": "src/index.ts",
   "exports": {

@@ -14,11 +14,11 @@ const FILES_TO_PROCESS = [
 ];
 
 const TEMPLATE_VARS = {
-  PROJECT_NAME: "fastify-react-router-starter",
-  PACKAGE_SCOPE: "@fastify-react-router-starter",
+  PROJECT_NAME: "fastify-project-starter",
+  PACKAGE_SCOPE: "@fastify-project-starter",
   AUTHOR_NAME: "Jarod Taylor",
   AUTHOR_EMAIL: "jarodrtaylor@gmail.com",
-  REPO_URL: "https://github.com/jarodtaylor/fastify-react-router-starter",
+  REPO_URL: "https://github.com/jarodtaylor/fastify-project-starter",
 };
 
 function generatePackageScope(projectName: string): string {

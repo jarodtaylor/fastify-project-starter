@@ -1,11 +1,11 @@
 {
-  "name": "create-fastify-react-router",
+  "name": "create-fastify-project",
   "version": "1.0.7",
   "type": "module",
   "description": "CLI tool to generate Fastify + React Router 7 monorepo projects",
   "main": "dist/index.js",
   "bin": {
-    "create-fastify-react-router": "dist/index.js"
+    "create-fastify-project": "dist/index.js"
   },
   "scripts": {
     "build": "tsc && npm run copy-template",

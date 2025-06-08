@@ -412,7 +412,7 @@ function displayManualSetupInstructions(
   );
   console.log(
     chalk.dim(
-      "   https://github.com/jarodtaylor/fastify-react-router-starter/issues",
+      "   https://github.com/jarodtaylor/fastify-project-starter/issues",
     ),
   );
 

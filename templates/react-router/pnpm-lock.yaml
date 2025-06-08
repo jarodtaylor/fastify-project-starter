@@ -20,10 +20,10 @@ importers:
 
   apps/api:
     dependencies:
-      '@fastify-react-router-starter/database':
+      '@fastify-project-starter/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@fastify-react-router-starter/shared-utils':
+      '@fastify-project-starter/shared-utils':
         specifier: workspace:*
         version: link:../../packages/shared-utils
       '@fastify/cors':

@@ -20,6 +20,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          run_install: false
+
+      - name: ✅ Validate pnpm Installation
+        run: |
+          pnpm --version || { echo "pnpm is not installed"; exit 1; }
+
       - name: 🚀 Test CLI installation and generation
         run: |
           cd /tmp
@@ -31,11 +40,6 @@ jobs:
           cd test-published
           ls packages/ | grep -E "(database|shared-utils|typescript-config)" || exit 1
           ls apps/ | grep -E "(api|web)" || exit 1
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          run_install: false
 
       - name: 🧪 Test generated project functionality
         run: |

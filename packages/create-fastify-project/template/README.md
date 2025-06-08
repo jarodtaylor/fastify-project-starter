@@ -45,12 +45,12 @@ A **production-ready starter** that gives you everything needed to build scalabl
 
 ```bash
 # Default setup (SQLite + Prisma + Biome)
-npx create-fastify-react-router my-app
+npx create-fastify-project my-app
 cd my-app
 pnpm dev
 
 # Or with PostgreSQL for production
-npx create-fastify-react-router my-app --db postgres
+npx create-fastify-project my-app --db postgres
 cd my-app
 # Add your DATABASE_URL to .env, then:
 pnpm dev
@@ -61,7 +61,7 @@ pnpm dev
 ### Option 2: Clone and Fork
 
 ```bash
-git clone https://github.com/jarodtaylor/fastify-react-router-starter.git my-app
+git clone https://github.com/jarodtaylor/fastify-project-starter.git my-app
 cd my-app
 rm -rf .git && git init
 pnpm install
@@ -260,10 +260,10 @@ The CLI provides flexible options to customize your project generation:
 
 ```bash
 # Default setup (SQLite + Prisma + Biome)
-npx create-fastify-react-router my-app
+npx create-fastify-project my-app
 
 # Custom project name with options
-npx create-fastify-react-router my-app [options]
+npx create-fastify-project my-app [options]
 ```
 
 ### Available Options
@@ -280,19 +280,19 @@ npx create-fastify-react-router my-app [options]
 
 ```bash
 # PostgreSQL with Prisma (production-ready)
-npx create-fastify-react-router my-app --db postgres
+npx create-fastify-project my-app --db postgres
 
 # MySQL with ESLint
-npx create-fastify-react-router my-app --db mysql --lint eslint
+npx create-fastify-project my-app --db mysql --lint eslint
 
 # No database/ORM (API only)
-npx create-fastify-react-router my-app --orm none
+npx create-fastify-project my-app --orm none
 
 # Quick generation without dependencies
-npx create-fastify-react-router my-app --no-install --no-git
+npx create-fastify-project my-app --no-install --no-git
 
 # Full customization
-npx create-fastify-react-router my-app --db postgres --lint eslint --no-git
+npx create-fastify-project my-app --db postgres --lint eslint --no-git
 ```
 
 ### Database Configuration
@@ -333,10 +333,10 @@ pnpm dev
 
 ```bash
 # View all CLI options and help
-npx create-fastify-react-router --help
+npx create-fastify-project --help
 
 # Check CLI version
-npx create-fastify-react-router --version
+npx create-fastify-project --version
 ```
 
 ## 🗺️ Coming Soon
@@ -369,7 +369,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 **Ready to build something amazing?** 🚀
 
 ```bash
-npx create-fastify-react-router my-app
+npx create-fastify-project my-app
 cd my-app
 pnpm dev
 ```

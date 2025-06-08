@@ -16,8 +16,8 @@
   "dependencies": {
     "fastify": "^5.3.3",
     "@fastify/cors": "^10.0.1",
-    "@fastify-react-router-starter/database": "workspace:*",
-    "@fastify-react-router-starter/shared-utils": "workspace:*"
+    "@fastify-project-starter/database": "workspace:*",
+    "@fastify-project-starter/shared-utils": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",

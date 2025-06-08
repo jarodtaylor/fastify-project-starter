@@ -17,7 +17,7 @@ const version = packageJson.version;
 const program = new Command();
 
 program
-  .name("create-fastify-react-router")
+  .name("create-fastify-project")
   .description("Create a new Fastify + React Router 7 monorepo project")
   .version(version)
   .argument("[project-name]", "Name of the project to create")
