@@ -1,10 +1,12 @@
 {
-  "name": "@fastify-react-router-starter/typescript-config",
+  "name": "@fastify-project-starter/typescript-config",
   "version": "1.0.0",
   "main": "base.json",
   "exports": {
     "./base.json": "./base.json",
     ".": "./base.json"
   },
-  "files": ["base.json"]
+  "files": [
+    "base.json"
+  ]
 }

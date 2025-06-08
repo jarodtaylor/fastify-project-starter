@@ -14,7 +14,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@fastify-react-router-starter/*": ["packages/*", "packages/*/src"]
+      "@fastify-project-starter/*": ["packages/*", "packages/*/src"]
     }
   },
   "exclude": ["node_modules", "dist"]

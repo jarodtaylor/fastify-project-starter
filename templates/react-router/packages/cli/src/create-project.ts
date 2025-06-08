@@ -32,7 +32,7 @@ export interface ProjectOptions {
 
 export async function createProject(
   projectName: string,
-  cliOptions: Partial<ProjectOptions>,
+  cliOptions: Partial<ProjectOptions>
 ) {
   const projectPath = resolve(process.cwd(), projectName);
 
@@ -96,7 +96,7 @@ export async function createProject(
   if (options.install) {
     dependenciesInstalled = await handleDependencyInstallation(
       projectPath,
-      spinner,
+      spinner
     );
   }
 
@@ -111,8 +111,8 @@ export async function createProject(
   } else if (options.orm === "prisma" && !dependenciesInstalled) {
     console.log(
       chalk.yellow(
-        "⚠️  Skipping database setup because dependencies installation failed",
-      ),
+        "⚠️  Skipping database setup because dependencies installation failed"
+      )
     );
   }
 
@@ -139,7 +139,7 @@ export async function createProject(
  */
 async function performPreFlightChecks(
   projectPath: string,
-  cliOptions: Partial<ProjectOptions>,
+  cliOptions: Partial<ProjectOptions>
 ): Promise<void> {
   // Check if directory exists
   if (existsSync(projectPath)) {
@@ -167,7 +167,7 @@ async function performPreFlightChecks(
           "On Unix systems, check permissions with: ls -la",
           "Ensure sufficient disk space is available",
         ],
-      },
+      }
     );
     error.display();
     process.exit(1);
@@ -197,7 +197,7 @@ async function performPreFlightChecks(
  */
 async function handleDependencyInstallation(
   projectPath: string,
-  spinner: Ora,
+  spinner: Ora
 ): Promise<boolean> {
   spinner.start("Installing dependencies...");
   try {
@@ -211,7 +211,7 @@ async function handleDependencyInstallation(
       spinner.succeed("Formatted generated code");
     } catch (error) {
       spinner.warn(
-        "Could not format generated code (this is usually not critical)",
+        "Could not format generated code (this is usually not critical)"
       );
     }
 
@@ -234,7 +234,7 @@ async function handleDependencyInstallation(
 async function handleDatabaseSetup(
   projectPath: string,
   spinner: Ora,
-  options: ProjectOptions,
+  options: ProjectOptions
 ): Promise<void> {
   spinner.start("Setting up database...");
   try {
@@ -243,7 +243,7 @@ async function handleDatabaseSetup(
     await execa(
       "cp",
       ["packages/database/.env.example", "packages/database/.env"],
-      { cwd: projectPath },
+      { cwd: projectPath }
     );
 
     // Generate Prisma client (run from database package directory)
@@ -286,7 +286,7 @@ async function handleDatabaseSetup(
           helpUrl:
             "https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch",
         },
-        error as Error,
+        error as Error
       );
     } else {
       enhancedError = handlePackageManagerError(error as ExecaError, {
@@ -306,7 +306,7 @@ async function handleDatabaseSetup(
 async function handleExternalDatabaseSetup(
   projectPath: string,
   spinner: Ora,
-  options: ProjectOptions,
+  options: ProjectOptions
 ): Promise<void> {
   spinner.start("Setting up database configuration...");
   try {
@@ -315,7 +315,7 @@ async function handleExternalDatabaseSetup(
     await execa(
       "cp",
       ["packages/database/.env.example", "packages/database/.env"],
-      { cwd: projectPath },
+      { cwd: projectPath }
     );
 
     // Generate Prisma client (but don't push to database)
@@ -327,24 +327,22 @@ async function handleExternalDatabaseSetup(
 
     // Display database-specific setup instructions
     console.log(
-      chalk.yellow(`\n🗄️  ${options.db.toUpperCase()} Database Setup Required:`),
+      chalk.yellow(`\n🗄️  ${options.db.toUpperCase()} Database Setup Required:`)
     );
     console.log(chalk.cyan("   1. Set up your database server"));
     console.log(
       chalk.cyan(
-        `   2. Update DATABASE_URL in .env with your ${options.db} connection string`,
-      ),
+        `   2. Update DATABASE_URL in .env with your ${options.db} connection string`
+      )
     );
     console.log(
-      chalk.cyan("   3. Run: cd packages/database && pnpm prisma db push"),
+      chalk.cyan("   3. Run: cd packages/database && pnpm prisma db push")
     );
     console.log(chalk.dim("   💡 See README.md for database setup examples"));
   } catch (error) {
     spinner.fail("Failed to set up database configuration");
     console.log(
-      chalk.red(
-        `❌ Database configuration failed: ${(error as Error).message}`,
-      ),
+      chalk.red(`❌ Database configuration failed: ${(error as Error).message}`)
     );
     console.log(chalk.yellow("\n🔧 Manual setup required:"));
     console.log(chalk.cyan("   cd packages/database"));
@@ -358,7 +356,7 @@ async function handleExternalDatabaseSetup(
  */
 async function handleGitInitialization(
   projectPath: string,
-  spinner: Ora,
+  spinner: Ora
 ): Promise<void> {
   spinner.start("Initializing git repository...");
   try {
@@ -384,7 +382,7 @@ async function handleGitInitialization(
  */
 function displayManualSetupInstructions(
   projectName: string,
-  options: ProjectOptions,
+  options: ProjectOptions
 ): void {
   console.log(chalk.red("\n⚠️  Project created but requires manual setup:"));
 
@@ -398,7 +396,7 @@ function displayManualSetupInstructions(
     console.log(chalk.yellow("\n🗄️  Set up database:"));
     console.log(chalk.cyan("   cp .env.example .env"));
     console.log(
-      chalk.cyan("   cp packages/database/.env.example packages/database/.env"),
+      chalk.cyan("   cp packages/database/.env.example packages/database/.env")
     );
     console.log(chalk.cyan("   cd packages/database && pnpm prisma generate"));
     console.log(chalk.cyan("   cd packages/database && pnpm prisma db push"));
@@ -408,18 +406,18 @@ function displayManualSetupInstructions(
   console.log(chalk.cyan("   pnpm dev"));
 
   console.log(
-    chalk.dim("\n💡 Need help? Check the README.md or report issues at:"),
+    chalk.dim("\n💡 Need help? Check the README.md or report issues at:")
   );
   console.log(
     chalk.dim(
-      "   https://github.com/jarodtaylor/fastify-react-router-starter/issues",
-    ),
+      "   https://github.com/jarodtaylor/fastify-project-starter/issues"
+    )
   );
 
   console.log(
     chalk.red(
-      "\n❌ Setup incomplete - follow the steps above before running pnpm dev",
-    ),
+      "\n❌ Setup incomplete - follow the steps above before running pnpm dev"
+    )
   );
 }
 
@@ -428,7 +426,7 @@ function displayManualSetupInstructions(
  */
 function displaySuccessMessage(
   projectName: string,
-  options: ProjectOptions,
+  options: ProjectOptions
 ): void {
   console.log(chalk.green("\n✨ Project created successfully!"));
   console.log(chalk.yellow("\nNext steps:"));
@@ -438,8 +436,8 @@ function displaySuccessMessage(
   if (options.orm === "prisma" && options.db !== "sqlite") {
     console.log(
       chalk.cyan(
-        `  # Set up your ${options.db.toUpperCase()} database first, then:`,
-      ),
+        `  # Set up your ${options.db.toUpperCase()} database first, then:`
+      )
     );
     console.log(chalk.cyan("  pnpm db:push"));
   }
@@ -450,7 +448,7 @@ function displaySuccessMessage(
 
 async function validateProject(
   projectPath: string,
-  options: ProjectOptions,
+  options: ProjectOptions
 ): Promise<boolean> {
   let hasErrors = false;
 

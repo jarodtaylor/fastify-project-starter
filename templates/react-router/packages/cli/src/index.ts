@@ -10,14 +10,14 @@ import { validateProjectName } from "./utils/validation.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageJson = JSON.parse(
-  readFileSync(resolve(__dirname, "../package.json"), "utf-8"),
+  readFileSync(resolve(__dirname, "../package.json"), "utf-8")
 );
 const version = packageJson.version;
 
 const program = new Command();
 
 program
-  .name("create-fastify-react-router")
+  .name("create-fastify-project")
   .description("Create a new Fastify + React Router 7 monorepo project")
   .version(version)
   .argument("[project-name]", "Name of the project to create")
@@ -27,7 +27,7 @@ program
   .option(
     "--db <database>",
     "Database to use (sqlite, postgres, mysql)",
-    "sqlite",
+    "sqlite"
   )
   .option("--lint <linter>", "Linter to use (biome, eslint)", "biome")
   .action(async (projectName, options) => {
@@ -35,8 +35,8 @@ program
       console.log(chalk.blue.bold("🚀 Create Fastify React Router App"));
       console.log(
         chalk.gray(
-          "A modern monorepo template with Fastify API + React Router 7 frontend\n",
-        ),
+          "A modern monorepo template with Fastify API + React Router 7 frontend\n"
+        )
       );
 
       // Validate or prompt for project name
@@ -49,7 +49,7 @@ program
     } catch (error) {
       console.error(
         chalk.red.bold("❌ Error:"),
-        error instanceof Error ? error.message : "Unknown error",
+        error instanceof Error ? error.message : "Unknown error"
       );
       process.exit(1);
     }

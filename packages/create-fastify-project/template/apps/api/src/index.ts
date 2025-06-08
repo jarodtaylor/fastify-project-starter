@@ -4,11 +4,11 @@ import {
   deleteTodo,
   getTodos,
   toggleTodo,
-} from "@fastify-react-router-starter/database";
+} from "@fastify-project-starter/database";
 import {
   createApiResponse,
   formatApiError,
-} from "@fastify-react-router-starter/shared-utils";
+} from "@fastify-project-starter/shared-utils";
 import Fastify from "fastify";
 
 const fastify = Fastify({
@@ -67,7 +67,7 @@ fastify.patch<{ Params: { id: string } }>(
     } catch (error) {
       return createApiResponse(null, formatApiError(error));
     }
-  },
+  }
 );
 
 fastify.delete<{ Params: { id: string } }>(
@@ -80,7 +80,7 @@ fastify.delete<{ Params: { id: string } }>(
     } catch (error) {
       return createApiResponse(null, formatApiError(error));
     }
-  },
+  }
 );
 
 // CORS support for the web app

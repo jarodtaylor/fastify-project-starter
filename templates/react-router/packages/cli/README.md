@@ -8,7 +8,7 @@ A production-ready starter that scaffolds everything you need to build scalable 
 
 ```bash
 # Create a new project
-npx create-fastify-react-router my-app
+npx create-fastify-project my-app
 cd my-app
 pnpm dev
 ```
@@ -25,29 +25,29 @@ pnpm dev
 
 ```bash
 # SQLite (default - zero setup)
-npx create-fastify-react-router my-app
+npx create-fastify-project my-app
 
 # PostgreSQL (production-ready)
-npx create-fastify-react-router my-app --db postgres
+npx create-fastify-project my-app --db postgres
 
 # MySQL
-npx create-fastify-react-router my-app --db mysql
+npx create-fastify-project my-app --db mysql
 ```
 
 ### Development Options
 
 ```bash
 # Skip dependency installation (faster generation)
-npx create-fastify-react-router my-app --no-install
+npx create-fastify-project my-app --no-install
 
 # Skip git initialization
-npx create-fastify-react-router my-app --no-git
+npx create-fastify-project my-app --no-git
 
 # Use ESLint instead of Biome
-npx create-fastify-react-router my-app --lint eslint
+npx create-fastify-project my-app --lint eslint
 
 # Combine options
-npx create-fastify-react-router my-app --db postgres --lint eslint --no-git
+npx create-fastify-project my-app --db postgres --lint eslint --no-git
 ```
 
 ### All Available Options
@@ -112,7 +112,7 @@ my-app/
 ### 1. Generate Project
 
 ```bash
-npx create-fastify-react-router my-app
+npx create-fastify-project my-app
 cd my-app
 ```
 
@@ -249,20 +249,20 @@ pnpm install
 
 ## 🤝 Need Help?
 
-- 📖 **[Full Documentation](https://github.com/jarodtaylor/fastify-react-router-starter)**
-- 🐛 **[Report Issues](https://github.com/jarodtaylor/fastify-react-router-starter/issues)**
-- 💬 **[Discussions](https://github.com/jarodtaylor/fastify-react-router-starter/discussions)**
+- 📖 **[Full Documentation](https://github.com/jarodtaylor/fastify-project-starter)**
+- 🐛 **[Report Issues](https://github.com/jarodtaylor/fastify-project-starter/issues)**
+- 💬 **[Discussions](https://github.com/jarodtaylor/fastify-project-starter/discussions)**
 
 ## 📄 License
 
-MIT License - see [LICENSE](https://github.com/jarodtaylor/fastify-react-router-starter/blob/main/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/jarodtaylor/fastify-project-starter/blob/main/LICENSE) for details.
 
 ---
 
 **Ready to build something amazing?** 🚀
 
 ```bash
-npx create-fastify-react-router my-app
+npx create-fastify-project my-app
 cd my-app
 pnpm dev
 ```

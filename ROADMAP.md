@@ -31,6 +31,8 @@ npx create-fastify-project my-app
 ### **🔄 Repository Restructure (COMPLETED)**
 
 - [x] **Repository Rename** - `fastify-react-router-starter` → `fastify-project-starter`
+- [x] **CLI Rename** - `create-fastify-react-router` → `create-fastify-project`
+- [x] **Package Scope Update** - `@fastify-react-router-starter` → `@fastify-project-starter`
 - [x] **Directory Structure** - Created `packages/` and `templates/` directories
 - [x] **CLI Migration** - Moved CLI from root `cli/` to `packages/create-fastify-project/`
 - [x] **Template Extraction** - Moved current template to `templates/react-router/`

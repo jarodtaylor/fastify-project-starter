@@ -1,5 +1,5 @@
 {
-  "name": "fastify-react-router-starter",
+  "name": "fastify-project-starter",
   "version": "1.0.0",
   "description": "A monorepo template for building fullstack applications with Fastify APIs and React Router 7 frontends",
   "keywords": [
@@ -16,13 +16,13 @@
     "boilerplate",
     "template"
   ],
-  "homepage": "https://github.com/jarodtaylor/fastify-react-router-starter#readme",
+  "homepage": "https://github.com/jarodtaylor/fastify-project-starter#readme",
   "bugs": {
-    "url": "https://github.com/jarodtaylor/fastify-react-router-starter/issues"
+    "url": "https://github.com/jarodtaylor/fastify-project-starter/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jarodtaylor/fastify-react-router-starter.git"
+    "url": "https://github.com/jarodtaylor/fastify-project-starter.git"
   },
   "license": "MIT",
   "author": {
