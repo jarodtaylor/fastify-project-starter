@@ -7,10 +7,11 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { createProject } from "./create-project.js";
 import { validateProjectName } from "./utils/validation.js";
+import { runInteractiveMode, promptForProjectName } from "./utils/prompts.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageJson = JSON.parse(
-  readFileSync(resolve(__dirname, "../package.json"), "utf-8"),
+  readFileSync(resolve(__dirname, "../package.json"), "utf-8")
 );
 const version = packageJson.version;
 
@@ -27,29 +28,45 @@ program
   .option(
     "--db <database>",
     "Database to use (sqlite, postgres, mysql)",
-    "sqlite",
+    "sqlite"
   )
   .option("--lint <linter>", "Linter to use (biome, eslint)", "biome")
   .action(async (projectName, options) => {
     try {
-      console.log(chalk.blue.bold("🚀 Create Fastify Project"));
-      console.log(
-        chalk.gray(
-          "A modern monorepo template with Fastify API + React Router 7 frontend\n",
-        ),
-      );
+      // Check if we should run in interactive mode
+      if (!projectName) {
+        // Full interactive mode - prompt for project name and all options
+        const interactiveResult = await runInteractiveMode();
 
-      // Validate or prompt for project name
-      const validatedName = await validateProjectName(projectName);
+        // Create the project with interactive results
+        await createProject(interactiveResult.projectName, {
+          db: interactiveResult.db,
+          orm: interactiveResult.orm,
+          lint: interactiveResult.lint,
+          git: interactiveResult.git,
+          install: interactiveResult.install,
+        });
+      } else {
+        // Traditional CLI mode with optional interactive prompts for missing options
+        console.log(chalk.blue.bold("🚀 Create Fastify Project"));
+        console.log(
+          chalk.gray(
+            "A modern monorepo template with Fastify API + React Router 7 frontend\n"
+          )
+        );
 
-      // Create the project
-      await createProject(validatedName, options);
+        // Validate project name
+        const validatedName = await validateProjectName(projectName);
+
+        // Create the project (will prompt for missing options interactively)
+        await createProject(validatedName, options);
+      }
 
       // Success/error messaging is now handled in createProject
     } catch (error) {
       console.error(
         chalk.red.bold("❌ Error:"),
-        error instanceof Error ? error.message : "Unknown error",
+        error instanceof Error ? error.message : "Unknown error"
       );
       process.exit(1);
     }
