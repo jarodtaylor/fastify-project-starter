@@ -4,38 +4,36 @@ import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import { type ExecaError, execa } from "execa";
 import ora, { type Ora } from "ora";
-import { copyTemplate } from "./utils/copy-template.js";
+import { promptForOptions } from "./helpers/prompts.js";
 import {
-  EnhancedError,
-  checkFileSystemHealth,
-  handleFileSystemError,
-  handleGitError,
-  handleNetworkError,
-  handlePackageManagerError,
-} from "./utils/error-handling.js";
-import { promptForOptions } from "./utils/prompts.js";
-import { replaceTemplateVars } from "./utils/replace-vars.js";
-import {
-  checkNetworkEnvironment,
   validateProjectOptions,
-} from "./utils/validation.js";
+  checkNetworkEnvironment,
+} from "./helpers/validation.js";
 import {
-  fetchLatestVersions,
-  extractCurrentVersions,
-  updatePackageVersions,
-  displayVersionUpdates,
-  type VersionInfo,
-} from "./utils/version-fetcher.js";
+  checkFileSystemHealth,
+  EnhancedError,
+  handleFileSystemError,
+  handlePackageManagerError,
+  handleGitError,
+} from "./helpers/error-handling.js";
+import {
+  copyTemplateFiles,
+  customizeTemplate,
+  updateVersions,
+} from "./workflows/templates.js";
+import { installDependencies } from "./workflows/install.js";
+import { setupDatabase, setupExternalDatabase } from "./workflows/database.js";
+import { initializeGit } from "./workflows/git.js";
+import {
+  performPreFlightChecks,
+  validateProject,
+  displayManualSetupInstructions,
+  displaySuccessMessage,
+} from "./workflows/validation.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export interface ProjectOptions {
-  install: boolean;
-  git: boolean;
-  orm: "prisma" | "none";
-  db: "sqlite" | "postgres" | "mysql";
-  lint: "biome" | "eslint";
-}
+import type { ProjectOptions } from "./types.js";
 
 export async function createProject(
   projectName: string,
@@ -65,58 +63,27 @@ export async function createProject(
     process.exit(1);
   }
 
-  // Copy template files
-  spinner.start("Copying template files...");
-  try {
-    const templatePath = resolve(__dirname, "../template");
-    await copyTemplate(templatePath, projectPath, options);
-    spinner.succeed("Copied template files");
-  } catch (error) {
-    spinner.fail("Failed to copy template files");
-    const enhancedError = handleFileSystemError(error as Error, {
-      operation: "Template copying",
-      projectPath,
-      details: "Unable to copy template files to project directory",
-    });
-    enhancedError.display();
-    process.exit(1);
-  }
-
-  // Replace template variables
-  spinner.start("Customizing template...");
-  try {
-    await replaceTemplateVars(projectPath, projectName, options);
-    spinner.succeed("Customized template");
-  } catch (error) {
-    spinner.fail("Failed to customize template");
-    const enhancedError = handleFileSystemError(error as Error, {
-      operation: "Template customization",
-      projectPath,
-      details: "Unable to customize template variables",
-    });
-    enhancedError.display();
-    process.exit(1);
-  }
+  // Copy and customize template files
+  const templatePath = resolve(__dirname, "../template");
+  await copyTemplateFiles(templatePath, projectPath, options, spinner);
+  await customizeTemplate(projectPath, projectName, options, spinner);
 
   // Update dependencies to latest versions
-  await handleVersionUpdates(projectPath, spinner);
+  await updateVersions(projectPath, spinner);
 
   // Install dependencies with enhanced error handling
   let dependenciesInstalled = false;
   if (options.install) {
-    dependenciesInstalled = await handleDependencyInstallation(
-      projectPath,
-      spinner
-    );
+    dependenciesInstalled = await installDependencies(projectPath, spinner);
   }
 
   // Initialize database (only for SQLite when dependencies are installed)
   if (options.orm === "prisma" && dependenciesInstalled) {
     if (options.db === "sqlite") {
-      await handleDatabaseSetup(projectPath, spinner, options);
+      await setupDatabase(projectPath, spinner, options);
     } else {
       // For PostgreSQL/MySQL, only do basic setup without connecting
-      await handleExternalDatabaseSetup(projectPath, spinner, options);
+      await setupExternalDatabase(projectPath, spinner, options);
     }
   } else if (options.orm === "prisma" && !dependenciesInstalled) {
     console.log(
@@ -128,7 +95,7 @@ export async function createProject(
 
   // Initialize git with enhanced error handling
   if (options.git) {
-    await handleGitInitialization(projectPath, spinner);
+    await initializeGit(projectPath, spinner);
   }
 
   // Validate project setup
@@ -142,473 +109,4 @@ export async function createProject(
     spinner.succeed("Project validated successfully");
     displaySuccessMessage(projectName, options);
   }
-}
-
-/**
- * Enhanced pre-flight checks before project creation
- */
-async function performPreFlightChecks(
-  projectPath: string,
-  cliOptions: Partial<ProjectOptions>
-): Promise<void> {
-  // Check if directory exists
-  if (existsSync(projectPath)) {
-    throw new Error(`Directory "${projectPath}" already exists`);
-  }
-
-  // Validate CLI options early
-  validateProjectOptions(cliOptions);
-
-  // Check file system health
-  const { canWrite, issues } = await checkFileSystemHealth(projectPath);
-  if (!canWrite) {
-    const error = new EnhancedError(
-      "Cannot write to target directory",
-      {
-        operation: "Pre-flight check",
-        projectPath,
-        details: issues.join("; "),
-      },
-      {
-        message: "File system permission issues detected",
-        steps: [
-          "Check if you have write permissions to the current directory",
-          "Try running from a directory where you have write access",
-          "On Unix systems, check permissions with: ls -la",
-          "Ensure sufficient disk space is available",
-        ],
-      }
-    );
-    error.display();
-    process.exit(1);
-  }
-
-  if (issues.length > 0) {
-    console.log(chalk.yellow("⚠️  Warnings detected:"));
-    for (const issue of issues) {
-      console.log(chalk.yellow(`   • ${issue}`));
-    }
-    console.log(); // Extra spacing
-  }
-
-  // Check network environment
-  const { warnings } = checkNetworkEnvironment();
-  if (warnings.length > 0) {
-    console.log(chalk.blue("ℹ️  Environment notes:"));
-    for (const warning of warnings) {
-      console.log(chalk.blue(`   • ${warning}`));
-    }
-    console.log(); // Extra spacing
-  }
-}
-
-/**
- * Handle version updates for dependencies
- */
-async function handleVersionUpdates(
-  projectPath: string,
-  spinner: Ora
-): Promise<void> {
-  spinner.start("Checking for latest package versions...");
-
-  try {
-    // Find all package.json files in the project
-    const packageJsonPaths = await findPackageJsonFiles(projectPath);
-
-    if (packageJsonPaths.length === 0) {
-      spinner.warn("No package.json files found to update");
-      return;
-    }
-
-    let totalUpdates = 0;
-
-    // Process each package.json file
-    for (const packageJsonPath of packageJsonPaths) {
-      const { readFileSync, writeFileSync } = await import("node:fs");
-
-      try {
-        const packageJsonContent = readFileSync(packageJsonPath, "utf-8");
-        const currentVersions = extractCurrentVersions(packageJsonContent);
-
-        // Get list of packages to check (only those that exist in this package.json)
-        const packagesToCheck = [
-          "react-router",
-          "fastify",
-          "typescript",
-          "vite",
-          "@types/node",
-          "tsx",
-          "prisma",
-          "@prisma/client",
-          "@vitejs/plugin-react",
-          "biome",
-          "@biomejs/biome",
-        ].filter((pkg) => currentVersions[pkg]);
-
-        if (packagesToCheck.length > 0) {
-          // Fetch latest versions
-          const versionUpdates = await fetchLatestVersions(
-            packagesToCheck,
-            currentVersions,
-            { timeout: 3000 }
-          );
-
-          // Update package.json content
-          const updatedContent = updatePackageVersions(
-            packageJsonContent,
-            versionUpdates
-          );
-
-          if (updatedContent !== packageJsonContent) {
-            writeFileSync(packageJsonPath, updatedContent);
-            const updates = versionUpdates.filter((v) => v.updated);
-            totalUpdates += updates.length;
-          }
-        }
-      } catch (error) {
-        // Continue with other package.json files if one fails
-      }
-    }
-
-    if (totalUpdates > 0) {
-      spinner.succeed(`Updated ${totalUpdates} packages to latest versions`);
-
-      // Show summary of updates (for the main package.json)
-      const mainPackageJsonPath = resolve(projectPath, "package.json");
-      if (packageJsonPaths.includes(mainPackageJsonPath)) {
-        const { readFileSync } = await import("node:fs");
-        const content = readFileSync(mainPackageJsonPath, "utf-8");
-        const currentVersions = extractCurrentVersions(content);
-        const packagesToCheck = [
-          "react-router",
-          "fastify",
-          "typescript",
-          "vite",
-          "@types/node",
-          "tsx",
-          "prisma",
-          "@prisma/client",
-        ].filter((pkg) => currentVersions[pkg]);
-
-        const versionUpdates = await fetchLatestVersions(
-          packagesToCheck,
-          currentVersions
-        );
-        displayVersionUpdates(versionUpdates);
-      }
-    } else {
-      spinner.succeed("All dependencies are up to date");
-    }
-  } catch (error) {
-    spinner.warn("Version check failed, continuing with template versions");
-    console.log(
-      chalk.yellow(
-        "⚠️  Unable to check for latest versions, using template defaults"
-      )
-    );
-  }
-}
-
-/**
- * Find all package.json files in the project directory
- */
-async function findPackageJsonFiles(projectPath: string): Promise<string[]> {
-  const { readdir, stat } = await import("node:fs/promises");
-  const packageJsonFiles: string[] = [];
-
-  async function searchDirectory(dirPath: string): Promise<void> {
-    try {
-      const entries = await readdir(dirPath);
-
-      for (const entry of entries) {
-        const fullPath = resolve(dirPath, entry);
-        const stats = await stat(fullPath);
-
-        if (stats.isFile() && entry === "package.json") {
-          packageJsonFiles.push(fullPath);
-        } else if (
-          stats.isDirectory() &&
-          !entry.startsWith(".") &&
-          entry !== "node_modules"
-        ) {
-          await searchDirectory(fullPath);
-        }
-      }
-    } catch (error) {
-      // Skip directories we can't read
-    }
-  }
-
-  await searchDirectory(projectPath);
-  return packageJsonFiles;
-}
-
-/**
- * Handle dependency installation with enhanced error handling
- */
-async function handleDependencyInstallation(
-  projectPath: string,
-  spinner: Ora
-): Promise<boolean> {
-  spinner.start("Installing dependencies...");
-  try {
-    await execa("pnpm", ["install"], { cwd: projectPath });
-    spinner.succeed("Installed dependencies");
-
-    // Format generated code after dependencies are installed
-    spinner.start("Formatting generated code...");
-    try {
-      await execa("pnpm", ["format"], { cwd: projectPath });
-      spinner.succeed("Formatted generated code");
-    } catch (error) {
-      spinner.warn(
-        "Could not format generated code (this is usually not critical)"
-      );
-    }
-
-    return true;
-  } catch (error) {
-    spinner.fail("Failed to install dependencies");
-    const enhancedError = handlePackageManagerError(error as ExecaError, {
-      operation: "Dependency installation",
-      projectPath,
-      command: "pnpm install",
-    });
-    enhancedError.display();
-    return false;
-  }
-}
-
-/**
- * Handle database setup with enhanced error handling
- */
-async function handleDatabaseSetup(
-  projectPath: string,
-  spinner: Ora,
-  options: ProjectOptions
-): Promise<void> {
-  spinner.start("Setting up database...");
-  try {
-    // Copy .env file to root only (no database package duplication)
-    await execa("cp", [".env.example", ".env"], { cwd: projectPath });
-
-    // Generate Prisma client (run from database package directory)
-    await execa("pnpm", ["prisma", "generate"], {
-      cwd: resolve(projectPath, "packages/database"),
-    });
-
-    // Push database schema (run from database package directory)
-    await execa("pnpm", ["prisma", "db", "push"], {
-      cwd: resolve(projectPath, "packages/database"),
-    });
-
-    spinner.succeed("Set up database");
-  } catch (error) {
-    spinner.fail("Failed to set up database");
-
-    // Determine the specific type of error
-    const errorMessage = (error as Error).message?.toLowerCase() || "";
-    let enhancedError: EnhancedError;
-
-    if (errorMessage.includes("prisma") || errorMessage.includes("not found")) {
-      enhancedError = new EnhancedError(
-        "Prisma setup failed",
-        {
-          operation: "Database setup",
-          projectPath,
-          command: "prisma generate/db push",
-          details: (error as Error).message,
-        },
-        {
-          message: "Prisma database setup encountered issues",
-          steps: [
-            "The project was created successfully but database setup failed",
-            "You can set it up manually with the following commands:",
-            "cd packages/database",
-            "cp .env.example .env",
-            "pnpm prisma generate",
-            "pnpm prisma db push",
-          ],
-          helpUrl:
-            "https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch",
-        },
-        error as Error
-      );
-    } else {
-      enhancedError = handlePackageManagerError(error as ExecaError, {
-        operation: "Database setup",
-        projectPath,
-        command: "prisma commands",
-      });
-    }
-
-    enhancedError.display();
-  }
-}
-
-/**
- * Handle external database setup (PostgreSQL/MySQL) - without attempting connection
- */
-async function handleExternalDatabaseSetup(
-  projectPath: string,
-  spinner: Ora,
-  options: ProjectOptions
-): Promise<void> {
-  spinner.start("Setting up database configuration...");
-  try {
-    // Copy .env file to root only (no database package duplication)
-    await execa("cp", [".env.example", ".env"], { cwd: projectPath });
-
-    // Generate Prisma client (run from database package directory)
-    await execa("pnpm", ["prisma", "generate"], {
-      cwd: resolve(projectPath, "packages/database"),
-    });
-
-    spinner.succeed("Set up database configuration");
-
-    // Display database-specific setup instructions
-    console.log(
-      chalk.yellow(`\n🗄️  ${options.db.toUpperCase()} Database Setup Required:`)
-    );
-    console.log(chalk.cyan("   1. Set up your database server"));
-    console.log(
-      chalk.cyan(
-        `   2. Update DATABASE_URL in .env with your ${options.db} connection string`
-      )
-    );
-    console.log(
-      chalk.cyan("   3. Run: cd packages/database && pnpm prisma db push")
-    );
-    console.log(chalk.dim("   💡 See README.md for database setup examples"));
-  } catch (error) {
-    spinner.fail("Failed to set up database configuration");
-    console.log(
-      chalk.red(`❌ Database configuration failed: ${(error as Error).message}`)
-    );
-    console.log(chalk.yellow("\n🔧 Manual setup required:"));
-    console.log(chalk.cyan("   cp .env.example .env  # From project root"));
-    console.log(chalk.cyan("   cd packages/database && pnpm prisma generate"));
-  }
-}
-
-/**
- * Handle git initialization with enhanced error handling
- */
-async function handleGitInitialization(
-  projectPath: string,
-  spinner: Ora
-): Promise<void> {
-  spinner.start("Initializing git repository...");
-  try {
-    await execa("git", ["init"], { cwd: projectPath });
-    await execa("git", ["add", "."], { cwd: projectPath });
-    await execa("git", ["commit", "-m", "Initial commit"], {
-      cwd: projectPath,
-    });
-    spinner.succeed("Initialized git repository");
-  } catch (error) {
-    spinner.warn("Git initialization failed (this is not critical)");
-    const enhancedError = handleGitError(error as ExecaError, {
-      operation: "Git initialization",
-      projectPath,
-      command: "git init/add/commit",
-    });
-    enhancedError.display();
-  }
-}
-
-/**
- * Display manual setup instructions for when automated setup fails
- */
-function displayManualSetupInstructions(
-  projectName: string,
-  options: ProjectOptions
-): void {
-  console.log(chalk.red("\n⚠️  Project created but requires manual setup:"));
-
-  if (!options.install) {
-    console.log(chalk.yellow("\n📦 Install dependencies:"));
-    console.log(chalk.cyan(`   cd ${projectName}`));
-    console.log(chalk.cyan("   pnpm install"));
-  }
-
-  if (options.orm === "prisma") {
-    console.log(chalk.yellow("\n🗄️  Set up database:"));
-    console.log(chalk.cyan("   cp .env.example .env"));
-    console.log(chalk.cyan("   cd packages/database && pnpm prisma generate"));
-    console.log(chalk.cyan("   cd packages/database && pnpm prisma db push"));
-  }
-
-  console.log(chalk.yellow("\n🚀 Start development:"));
-  console.log(chalk.cyan("   pnpm dev"));
-
-  console.log(
-    chalk.dim("\n💡 Need help? Check the README.md or report issues at:")
-  );
-  console.log(
-    chalk.dim(
-      "   https://github.com/jarodtaylor/fastify-project-starter/issues"
-    )
-  );
-
-  console.log(
-    chalk.red(
-      "\n❌ Setup incomplete - follow the steps above before running pnpm dev"
-    )
-  );
-}
-
-/**
- * Display success message when project is created successfully
- */
-function displaySuccessMessage(
-  projectName: string,
-  options: ProjectOptions
-): void {
-  console.log(chalk.green("\n✨ Project created successfully!"));
-  console.log(chalk.yellow("\nNext steps:"));
-  console.log(chalk.cyan(`  cd ${projectName}`));
-
-  // Provide database-specific instructions
-  if (options.orm === "prisma" && options.db !== "sqlite") {
-    console.log(
-      chalk.cyan(
-        `  # Set up your ${options.db.toUpperCase()} database first, then:`
-      )
-    );
-    console.log(chalk.cyan("  pnpm db:push"));
-  }
-
-  console.log(chalk.cyan("  pnpm dev"));
-  console.log(chalk.green("\nHappy coding! 🎉"));
-}
-
-async function validateProject(
-  projectPath: string,
-  options: ProjectOptions
-): Promise<boolean> {
-  let hasErrors = false;
-
-  // Check if dependencies are installed by looking for node_modules
-  if (!existsSync(resolve(projectPath, "node_modules"))) {
-    hasErrors = true;
-  }
-
-  // Check if required packages exist
-  const requiredPackages = [
-    "packages/shared-utils",
-    "packages/typescript-config",
-  ];
-  if (options.orm === "prisma") {
-    requiredPackages.push("packages/database");
-  }
-
-  for (const pkg of requiredPackages) {
-    if (!existsSync(resolve(projectPath, pkg))) {
-      hasErrors = true;
-      break;
-    }
-  }
-
-  return hasErrors;
 }

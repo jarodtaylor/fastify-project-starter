@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { cp, readdir, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import type { ProjectOptions } from "../create-project.js";
+import type { ProjectOptions } from "../types.js";
 
 const EXCLUDE_PATTERNS = [
   "node_modules",
@@ -34,7 +34,7 @@ function shouldExclude(filename: string, fullPath?: string): boolean {
     if (pattern.includes("**")) {
       if (fullPath) {
         const regex = new RegExp(
-          pattern.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*"),
+          pattern.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*")
         );
         return regex.test(fullPath);
       }
@@ -56,7 +56,7 @@ function shouldExclude(filename: string, fullPath?: string): boolean {
 async function copyRecursive(
   src: string,
   dest: string,
-  basePath?: string,
+  basePath?: string
 ): Promise<void> {
   const entries = await readdir(src);
 
@@ -85,18 +85,18 @@ async function copyRecursive(
 export async function copyTemplate(
   templatePath: string,
   targetPath: string,
-  options: ProjectOptions,
+  options: ProjectOptions
 ): Promise<void> {
   // The templatePath should point to the bundled template directory
   // Verify it contains the expected structure
   const expectedFiles = ["package.json", "apps", "packages"];
   const hasExpectedStructure = expectedFiles.every((file) =>
-    existsSync(join(templatePath, file)),
+    existsSync(join(templatePath, file))
   );
 
   if (!hasExpectedStructure) {
     throw new Error(
-      `Template source does not contain expected project structure at: ${templatePath}`,
+      `Template source does not contain expected project structure at: ${templatePath}`
     );
   }
 

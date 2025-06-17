@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import type { ProjectOptions } from "../create-project.js";
+import type { ProjectOptions } from "../types.js";
 
 const FILES_TO_PROCESS = [
   "package.json",
@@ -41,7 +41,7 @@ function generateReplacements(projectName: string, options: ProjectOptions) {
 
 async function processFile(
   filePath: string,
-  replacements: Record<string, string>,
+  replacements: Record<string, string>
 ): Promise<void> {
   try {
     let content = await readFile(filePath, "utf-8");
@@ -60,7 +60,7 @@ async function processFile(
 
 async function processDirectory(
   dirPath: string,
-  replacements: Record<string, string>,
+  replacements: Record<string, string>
 ): Promise<void> {
   try {
     const entries = await readdir(dirPath);
@@ -94,7 +94,7 @@ async function processDirectory(
 export async function replaceTemplateVars(
   projectPath: string,
   projectName: string,
-  options: ProjectOptions,
+  options: ProjectOptions
 ): Promise<void> {
   const replacements = generateReplacements(projectName, options);
 
@@ -121,7 +121,7 @@ export async function replaceTemplateVars(
 
 async function updateDatabaseConfig(
   projectPath: string,
-  dbType: "postgres" | "mysql",
+  dbType: "postgres" | "mysql"
 ): Promise<void> {
   // Update only root .env.example (no more database package duplication)
   const envPath = join(projectPath, ".env.example");
@@ -130,7 +130,7 @@ async function updateDatabaseConfig(
 
 async function updateEnvFile(
   envPath: string,
-  dbType: "postgres" | "mysql",
+  dbType: "postgres" | "mysql"
 ): Promise<void> {
   try {
     let envContent = await readFile(envPath, "utf-8");
@@ -138,12 +138,12 @@ async function updateEnvFile(
     if (dbType === "postgres") {
       envContent = envContent.replace(
         'DATABASE_URL="file:../../data/dev.db"',
-        'DATABASE_URL="postgresql://user:password@localhost:5432/mydb"',
+        'DATABASE_URL="postgresql://user:password@localhost:5432/mydb"'
       );
     } else if (dbType === "mysql") {
       envContent = envContent.replace(
         'DATABASE_URL="file:../../data/dev.db"',
-        'DATABASE_URL="mysql://user:password@localhost:3306/mydb"',
+        'DATABASE_URL="mysql://user:password@localhost:3306/mydb"'
       );
     }
 
@@ -155,14 +155,14 @@ async function updateEnvFile(
 
 async function updatePrismaSchema(
   projectPath: string,
-  dbType: "postgres" | "mysql",
+  dbType: "postgres" | "mysql"
 ): Promise<void> {
   const schemaPath = join(
     projectPath,
     "packages",
     "database",
     "prisma",
-    "schema.prisma",
+    "schema.prisma"
   );
 
   try {
@@ -172,12 +172,12 @@ async function updatePrismaSchema(
     if (dbType === "postgres") {
       schemaContent = schemaContent.replace(
         'provider = "sqlite"',
-        'provider = "postgresql"',
+        'provider = "postgresql"'
       );
     } else if (dbType === "mysql") {
       schemaContent = schemaContent.replace(
         'provider = "sqlite"',
-        'provider = "mysql"',
+        'provider = "mysql"'
       );
     }
 
@@ -189,13 +189,13 @@ async function updatePrismaSchema(
 
 async function updateDatabaseDependencies(
   projectPath: string,
-  dbType: "postgres" | "mysql",
+  dbType: "postgres" | "mysql"
 ): Promise<void> {
   const packageJsonPath = join(
     projectPath,
     "packages",
     "database",
-    "package.json",
+    "package.json"
   );
 
   try {
@@ -222,7 +222,7 @@ async function updateDatabaseDependencies(
     await writeFile(
       packageJsonPath,
       JSON.stringify(packageJson, null, "\t"),
-      "utf-8",
+      "utf-8"
     );
   } catch (error) {
     console.warn("Warning: Could not update database package.json");
@@ -266,7 +266,7 @@ async function removePrismaConfig(projectPath: string): Promise<void> {
       await writeFile(
         rootPackageJsonPath,
         JSON.stringify(packageJson, null, "\t"),
-        "utf-8",
+        "utf-8"
       );
     }
 
@@ -276,7 +276,7 @@ async function removePrismaConfig(projectPath: string): Promise<void> {
       let workspaceContent = await readFile(workspaceConfigPath, "utf-8");
       workspaceContent = workspaceContent.replace(
         /\s*- "packages\/database"/g,
-        "",
+        ""
       );
       await writeFile(workspaceConfigPath, workspaceContent, "utf-8");
     }
@@ -302,7 +302,7 @@ async function removePrismaConfig(projectPath: string): Promise<void> {
       if (apiPackageJson.dependencies) {
         // Find and remove any dependency that contains 'database'
         const dependenciesToRemove = Object.keys(
-          apiPackageJson.dependencies,
+          apiPackageJson.dependencies
         ).filter((dep) => dep.includes("database"));
 
         for (const dep of dependenciesToRemove) {
@@ -315,7 +315,7 @@ async function removePrismaConfig(projectPath: string): Promise<void> {
       await writeFile(
         apiPackageJsonPath,
         JSON.stringify(apiPackageJson, null, "\t"),
-        "utf-8",
+        "utf-8"
       );
     }
 
@@ -408,7 +408,7 @@ start();
 
 async function configureLinter(
   projectPath: string,
-  linter: "eslint",
+  linter: "eslint"
 ): Promise<void> {
   try {
     // Remove Biome configuration file
@@ -460,7 +460,7 @@ async function configureLinter(
       await writeFile(
         rootPackageJsonPath,
         JSON.stringify(packageJson, null, "\t"),
-        "utf-8",
+        "utf-8"
       );
     }
 
@@ -497,7 +497,7 @@ async function configureLinter(
     const eslintConfigContent = `module.exports = ${JSON.stringify(
       eslintConfig,
       null,
-      2,
+      2
     )};`;
     await writeFile(eslintConfigPath, eslintConfigContent, "utf-8");
 
@@ -515,7 +515,7 @@ async function configureLinter(
     await writeFile(
       prettierConfigPath,
       JSON.stringify(prettierConfig, null, 2),
-      "utf-8",
+      "utf-8"
     );
 
     console.log("✓ Configured ESLint and Prettier");

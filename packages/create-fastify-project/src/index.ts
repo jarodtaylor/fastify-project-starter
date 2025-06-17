@@ -6,8 +6,8 @@ import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import { Command } from "commander";
 import { createProject } from "./create-project.js";
-import { validateProjectName } from "./utils/validation.js";
-import { runInteractiveMode, promptForProjectName } from "./utils/prompts.js";
+import { validateProjectName } from "./helpers/validation.js";
+import { runInteractiveMode, promptForProjectName } from "./helpers/prompts.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageJson = JSON.parse(

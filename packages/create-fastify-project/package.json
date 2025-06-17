@@ -8,8 +8,7 @@
     "create-fastify-project": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && npm run copy-template",
-    "copy-template": "node scripts/copy-template.js",
+    "build": "tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
