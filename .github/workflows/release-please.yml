@@ -24,10 +24,6 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release-type: node
-          package-name: create-fastify-project
-          # Only release from packages/create-fastify-project
-          path: packages/create-fastify-project
 
   publish-cli:
     needs: release-please
