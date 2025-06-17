@@ -356,6 +356,98 @@ node dist/index.js test-local --no-install --no-git
 
 > **📝 Note**: Contributors focus on features/fixes. Maintainers handle versioning, publishing, and releases.
 
+### For Maintainers: Release Branch Workflow
+
+When preparing a new release, follow this workflow to ensure clean, testable releases:
+
+#### **Step 1: Create Release Branch**
+
+```bash
+# From the feature branch (e.g., refactor-project)
+git checkout -b release/X.Y.Z
+
+# Example: git checkout -b release/1.1.0
+```
+
+- **Purpose**: Dedicated branch for release preparation
+- **Naming**: `release/X.Y.Z` (semantic versioning)
+- **Benefit**: Development can continue while preparing release
+
+#### **Step 2: Update Package Version**
+
+```bash
+# Navigate to CLI package
+cd packages/create-fastify-project
+
+# Update version (manual edit or npm command)
+npm version X.Y.Z --no-git-tag-version
+
+# Example: npm version 1.1.0 --no-git-tag-version
+```
+
+- **`--no-git-tag-version`**: Prevents auto-tagging (we'll do this manually)
+- **Semantic Versioning**:
+  - Patch: `1.0.13 → 1.0.14` (bug fixes)
+  - Minor: `1.0.13 → 1.1.0` (new features, refactors)
+  - Major: `1.0.13 → 2.0.0` (breaking changes)
+
+#### **Step 3: Commit Version Bump**
+
+```bash
+# From repository root
+git add packages/create-fastify-project/package.json
+git commit -m "chore: bump version to X.Y.Z for [release description]"
+
+# Example: git commit -m "chore: bump version to 1.1.0 for tsup migration release"
+```
+
+- **Commit Type**: `chore:` for version bumps
+- **Clean History**: Single commit for version change
+
+#### **Step 4: Push Release Branch**
+
+```bash
+git push origin release/X.Y.Z
+```
+
+#### **Step 5: Create GitHub Release**
+
+1. **Go to GitHub**: Repository → Releases → Create Release
+2. **Tag**: `vX.Y.Z` (e.g., `v1.1.0`)
+3. **Target**: `release/X.Y.Z` branch
+4. **Title**: `vX.Y.Z - [Release Name]`
+5. **Description**: Include:
+   - **What's New**: Major features/changes
+   - **Breaking Changes**: If any
+   - **Migration Guide**: If needed
+   - **Full Changelog**: Link to compare view
+
+#### **Step 6: Automatic Publishing**
+
+- GitHub Actions will automatically publish to npm when release is created
+- Monitor the "Publish CLI to npm" workflow
+- Verify publication: `npm view create-fastify-project version`
+
+#### **Step 7: Post-Release Cleanup**
+
+```bash
+# Merge release branch to main (optional)
+git checkout main
+git merge release/X.Y.Z
+
+# Delete release branch (after successful release)
+git branch -d release/X.Y.Z
+git push origin --delete release/X.Y.Z
+```
+
+#### **Benefits of This Workflow**
+
+- **🔒 Stable Releases**: Test release branch before tagging
+- **🚀 Continuous Development**: Feature work continues on other branches
+- **🔧 Hotfix Support**: Can patch release branches independently
+- **📝 Clear History**: Clean version bumps and release commits
+- **🤖 Automated Publishing**: GitHub Actions handles npm publishing
+
 ### Testing Checklist
 
 Before submitting a PR:
