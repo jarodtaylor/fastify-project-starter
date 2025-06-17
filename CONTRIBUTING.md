@@ -399,18 +399,6 @@ cd templates/react-router && pnpm build
 cd packages/create-fastify-project && pnpm build
 ```
 
-## 🚀 **Release Process** (Maintainers Only)
-
-> **👥 Contributors**: You don't handle releases! Submit PRs and maintainers take care of the rest.
-
-**Automated Release Workflow:**
-
-1. Merge contributor PRs
-2. Update version: `cd packages/create-fastify-project && npm version patch`
-3. Commit and push version bump
-4. Create GitHub Release with tag `vX.Y.Z`
-5. GitHub Actions automatically publishes to npm
-
 ## 🤝 **Getting Help**
 
 - **Questions**: Open a [Discussion](https://github.com/jarodtaylor/fastify-project-starter/discussions)

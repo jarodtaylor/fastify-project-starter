@@ -1,3 +1,3 @@
 [tools]
-node = "20.18.1"  # Latest LTS
-pnpm = "10.11.1"  # From your package.json packageManager field
+node = "20.18.1"
+pnpm = "10.11.1"

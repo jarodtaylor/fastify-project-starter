@@ -1,7 +1,8 @@
 {
   "name": "fastify-project-starter",
-  "version": "1.0.0",
-  "description": "CLI tool and templates for generating Fastify-based fullstack projects",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Workspace for Fastify project starter CLI and templates",
   "keywords": [
     "fastify",
     "cli",
