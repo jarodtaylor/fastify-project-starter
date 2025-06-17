@@ -121,9 +121,9 @@ jobs:
           cd templates/react-router
           # Test the template directly (not generated projects)
           cp .env.example .env
-          # Generate Prisma client and push database schema
-          cd packages/database && pnpm prisma generate && pnpm prisma db push
-          cd ../..
+          # Generate Prisma client and push database schema from root
+          pnpm --filter database prisma generate
+          pnpm --filter database prisma db push
           # Quick smoke test
           timeout 10s pnpm dev || true
 

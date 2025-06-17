@@ -20,10 +20,13 @@ jobs:
 
     steps:
       - name: 🎯 Run Release Please
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v3
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
+          package-name: create-fastify-project
+          path: packages/create-fastify-project
 
   publish-cli:
     needs: release-please
