@@ -1,0 +1,113 @@
+name: 🚀 Release Please
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
+
+    steps:
+      - name: 🎯 Run Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
+          package-name: create-fastify-project
+          # Only release from packages/create-fastify-project
+          path: packages/create-fastify-project
+
+  publish-cli:
+    needs: release-please
+    runs-on: ubuntu-latest
+    if: ${{ needs.release-please.outputs.release_created }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.11.1"
+          run_install: false
+
+      - name: 🗃️ Setup npm registry
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: 📚 Install dependencies
+        run: |
+          pnpm install
+          cd packages/create-fastify-project && pnpm install
+
+      - name: 🏗️ Build CLI
+        run: |
+          cd packages/create-fastify-project
+          echo "🔨 Building CLI..."
+          pnpm build
+
+          echo "📁 Build output verification:"
+          ls -la dist/ || echo "❌ No dist directory created"
+
+      - name: 🧪 Test CLI functionality
+        run: |
+          cd packages/create-fastify-project
+
+          if [ -f "dist/index.js" ]; then
+            echo "✅ dist/index.js exists"
+
+            # Test version command
+            echo "🧪 Testing version command:"
+            VERSION_OUTPUT=$(node dist/index.js --version)
+            echo "CLI reports version: $VERSION_OUTPUT"
+
+            # Test help command
+            echo "🧪 Testing help command:"
+            node dist/index.js --help || echo "❌ Help command failed"
+
+          else
+            echo "❌ dist/index.js is missing"
+            exit 1
+          fi
+
+      - name: 📦 Publish to npm
+        run: |
+          cd packages/create-fastify-project
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: ✅ Verify published version
+        run: |
+          # Wait for npm propagation
+          sleep 30
+
+          # Check published version
+          PUBLISHED_VERSION=$(npm view create-fastify-project version)
+          TAG_VERSION=${{ needs.release-please.outputs.tag_name }}
+          # Remove v prefix from tag
+          TAG_VERSION=${TAG_VERSION#v}
+
+          if [ "$PUBLISHED_VERSION" != "$TAG_VERSION" ]; then
+            echo "⚠️ Warning: Published version $PUBLISHED_VERSION doesn't match tag $TAG_VERSION"
+            echo "This might be due to npm propagation delay"
+          else
+            echo "✅ Successfully published version $PUBLISHED_VERSION to npm"
+          fi

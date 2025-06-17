@@ -1,0 +1,11 @@
+{
+  "release-type": "node",
+  "packages": {
+    "packages/create-fastify-project": {
+      "package-name": "create-fastify-project",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "node"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
