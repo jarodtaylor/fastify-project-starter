@@ -56,6 +56,27 @@ npx create-fastify-project my-app
 - [x] **CI/CD Pipeline** - Robust formatting, linting, and validation checks
 - [x] **Automated Publishing** - Reliable GitHub Actions workflow for npm publishing
 - [x] **Precheck System** - `pnpm precheck` catches all CI issues locally before commits
+- [ ] **Fix Template** - generated template has .env in the root of the monorepo and in the packages directory.
+- [ ] **Update .gitignore** - Generated template has things in it that should be ignored by git:
+  - `node_modules`
+  - `.turbo/`
+  - `apps/web/.react-router/`
+  - `apps/web/node_modules/.vite/`
+
+Also -- check about the template directory inside of the CLI -- is that supposed to be there or is it supposed to use the /template directory in the root of the project starter?
+
+Postgres table doesn't exist? Also, should the table name be todo and not Todo? Or does that not matter?
+
+| Schema | Name | Type  | Owner       |
+| ------ | ---- | ----- | ----------- |
+| public | Todo | table | jarodtaylor |
+
+```
+SELECT 1
+Time: 0.020s
+test*delete_later> SELECT * FROM Todo;
+relation "todo" does not exist
+```
 
 ### **📚 Documentation & Processes**
 
@@ -256,9 +277,9 @@ npx create-fastify-project my-app
 
 ### **Current State Summary**
 
-✅ **Fully Functional CLI**: `create-fastify-project@1.0.13` published and working  
-✅ **Robust Infrastructure**: CI/CD, formatting, linting, precheck system all working  
-✅ **Complete React Router Template**: Production-ready Fastify + React Router 7 + Prisma stack  
+✅ **Fully Functional CLI**: `create-fastify-project@1.0.13` published and working
+✅ **Robust Infrastructure**: CI/CD, formatting, linting, precheck system all working
+✅ **Complete React Router Template**: Production-ready Fastify + React Router 7 + Prisma stack
 ✅ **Clean Architecture**: Multi-template system ready for expansion
 
 ### **Immediate Next Steps**

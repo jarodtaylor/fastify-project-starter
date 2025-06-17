@@ -1,6 +1,12 @@
 .DS_Store
 /node_modules/
 
+# Turbo
+/.turbo/
+
 # React Router
 /.react-router/
 /build/
+
+# Vite
+/node_modules/.vite/

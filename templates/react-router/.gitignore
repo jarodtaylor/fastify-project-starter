@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+.turbo/
+
+# Development
+.DS_Store
+*.log
+*.db
+
+# Environment variables
+.env
+.env.*.local
+
+# React Router
+apps/web/.react-router/
+
+# Vite
+apps/web/node_modules/.vite/
+
+# Database
+data/*.db
+data/*.db-journal
