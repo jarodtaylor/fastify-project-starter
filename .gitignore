@@ -29,3 +29,6 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Private documentation
+RELEASE.md
