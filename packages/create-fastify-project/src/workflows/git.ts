@@ -1,6 +1,6 @@
 import { execa, type ExecaError } from "execa";
 import type { Ora } from "ora";
-import { handleGitError } from "../helpers/error-handling.js";
+import { handleGitError } from "../helpers/error-handling";
 
 /**
  * Handle git initialization with enhanced error handling

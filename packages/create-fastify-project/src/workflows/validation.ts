@@ -1,16 +1,17 @@
-import { existsSync } from "node:fs";
 import { access, constants } from "node:fs/promises";
+import { existsSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import chalk from "chalk";
+import { logger } from "../helpers/logger";
 import {
   checkFileSystemHealth,
   EnhancedError,
-} from "../helpers/error-handling.js";
+} from "../helpers/error-handling";
 import {
   validateProjectOptions,
   checkNetworkEnvironment,
-} from "../helpers/validation.js";
-import type { ProjectOptions } from "../helpers/types.js";
+} from "../helpers/validation";
+import type { ProjectOptions } from "../types";
 
 /**
  * Perform pre-flight checks before project creation
@@ -52,21 +53,21 @@ export async function performPreFlightChecks(
   }
 
   if (issues.length > 0) {
-    console.log(chalk.yellow("⚠️  Warnings detected:"));
+    logger.warn("Warnings detected:");
     for (const issue of issues) {
-      console.log(chalk.yellow(`   • ${issue}`));
+      logger.listItem(issue);
     }
-    console.log(); // Extra spacing
+    logger.break();
   }
 
   // Check network environment
   const { warnings } = checkNetworkEnvironment();
   if (warnings.length > 0) {
-    console.log(chalk.blue("ℹ️  Environment notes:"));
+    logger.info("Environment notes:");
     for (const warning of warnings) {
-      console.log(chalk.blue(`   • ${warning}`));
+      logger.listItem(warning);
     }
-    console.log(); // Extra spacing
+    logger.break();
   }
 }
 
@@ -91,7 +92,7 @@ export async function validateProject(
     try {
       await access(filePath, constants.F_OK);
     } catch {
-      console.log(chalk.red(`❌ Missing essential file: ${file}`));
+      logger.error(`Missing essential file: ${file}`);
       hasErrors = true;
     }
   }
@@ -108,7 +109,7 @@ export async function validateProject(
       try {
         await access(filePath, constants.F_OK);
       } catch {
-        console.log(chalk.red(`❌ Missing Prisma file: ${file}`));
+        logger.error(`Missing Prisma file: ${file}`);
         hasErrors = true;
       }
     }
@@ -124,52 +125,88 @@ export function displayManualSetupInstructions(
   projectName: string,
   options: ProjectOptions
 ): void {
-  console.log(chalk.yellow("\n⚠️  Manual setup required"));
-  console.log(chalk.cyan("\n📁 Navigate to your project:"));
-  console.log(chalk.cyan(`   cd ${projectName}`));
+  logger.warn("Manual setup required");
+
+  const steps: Array<{
+    title: string;
+    command?: string;
+    description?: string;
+  }> = [
+    {
+      title: "Navigate to your project",
+      command: `cd ${projectName}`,
+    },
+  ];
 
   if (!options.install) {
-    console.log(chalk.cyan("\n📦 Install dependencies:"));
-    console.log(chalk.cyan("   pnpm install"));
+    steps.push({
+      title: "Install dependencies",
+      command: "pnpm install",
+    });
   }
 
   if (options.orm === "prisma") {
-    console.log(chalk.cyan("\n🗄️  Set up database:"));
-    console.log(chalk.cyan("   cp .env.example .env"));
+    steps.push({
+      title: "Set up environment",
+      command: "cp .env.example .env",
+    });
+
     if (options.db !== "sqlite") {
-      console.log(
-        chalk.cyan(
-          `   # Update DATABASE_URL in .env for ${options.db.toUpperCase()}`
-        )
-      );
+      steps.push({
+        title: "Configure database",
+        command: "# Edit .env file",
+        description: `Update DATABASE_URL in .env for ${options.db.toUpperCase()}`,
+      });
     }
-    console.log(chalk.cyan("   cd packages/database"));
-    console.log(chalk.cyan("   pnpm prisma generate"));
-    console.log(chalk.cyan("   pnpm prisma db push"));
-    console.log(chalk.cyan("   cd ../.."));
+
+    steps.push(
+      {
+        title: "Generate Prisma client",
+        command: "cd packages/database && pnpm prisma generate",
+      },
+      {
+        title: "Push database schema",
+        command: "pnpm prisma db push",
+      },
+      {
+        title: "Return to project root",
+        command: "cd ../..",
+      }
+    );
   }
 
   if (!options.git) {
-    console.log(chalk.cyan("\n🔄 Initialize git (optional):"));
-    console.log(chalk.cyan("   git init"));
-    console.log(chalk.cyan("   git add ."));
-    console.log(chalk.cyan("   git commit -m 'Initial commit'"));
+    steps.push(
+      {
+        title: "Initialize git (optional)",
+        command: "git init",
+      },
+      {
+        title: "Make initial commit",
+        command: "git add . && git commit -m 'Initial commit'",
+      }
+    );
   }
 
-  console.log(chalk.cyan("\n🚀 Start development:"));
-  console.log(chalk.cyan("   pnpm dev"));
-  console.log(
-    chalk.dim("\n💡 Check the README.md for more detailed instructions")
-  );
+  steps.push({
+    title: "Start development",
+    command: "pnpm dev",
+  });
+
+  logger.nextSteps(projectName, steps);
+  logger.dim("💡 Check the README.md for more detailed instructions");
 }
 
 /**
  * Display success message when project is created successfully
+ * @deprecated Use the enhanced logger system in create-project.ts instead
  */
 export function displaySuccessMessage(
   projectName: string,
   options: ProjectOptions
 ): void {
+  // This function is deprecated in favor of the enhanced logger system
+  // in create-project.ts, but keeping for backwards compatibility
   console.log(chalk.green("\n🎉 Project created successfully!"));
   console.log(chalk.cyan("\n📁 Navigate to your project:"));
   console.log(chalk.cyan(`   cd ${projectName}`));

@@ -5,8 +5,8 @@ import chalk from "chalk";
 import {
   EnhancedError,
   handlePackageManagerError,
-} from "../helpers/error-handling.js";
-import type { ProjectOptions } from "../helpers/types.js";
+} from "../helpers/error-handling";
+import type { ProjectOptions } from "../types";
 
 /**
  * Handle database setup with enhanced error handling

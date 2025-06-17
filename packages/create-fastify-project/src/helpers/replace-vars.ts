@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import type { ProjectOptions } from "../types.js";
+import type { ProjectOptions } from "../types";
 
 const FILES_TO_PROCESS = [
   "package.json",

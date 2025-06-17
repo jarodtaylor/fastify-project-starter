@@ -1,6 +1,6 @@
 import prompts from "prompts";
 import chalk from "chalk";
-import type { ProjectOptions } from "../types.js";
+import type { ProjectOptions } from "../types";
 
 export interface InteractiveOptions extends ProjectOptions {
   projectName: string;

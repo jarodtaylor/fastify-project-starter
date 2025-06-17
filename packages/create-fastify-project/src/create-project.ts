@@ -1,45 +1,48 @@
 import { existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import chalk from "chalk";
 import { type ExecaError, execa } from "execa";
-import ora, { type Ora } from "ora";
-import { promptForOptions } from "./helpers/prompts.js";
+import { logger } from "./helpers/logger";
+import { promptForOptions } from "./helpers/prompts";
 import {
   validateProjectOptions,
   checkNetworkEnvironment,
-} from "./helpers/validation.js";
+} from "./helpers/validation";
 import {
   checkFileSystemHealth,
   EnhancedError,
   handleFileSystemError,
   handlePackageManagerError,
   handleGitError,
-} from "./helpers/error-handling.js";
+} from "./helpers/error-handling";
 import {
   copyTemplateFiles,
   customizeTemplate,
   updateVersions,
-} from "./workflows/templates.js";
-import { installDependencies } from "./workflows/install.js";
-import { setupDatabase, setupExternalDatabase } from "./workflows/database.js";
-import { initializeGit } from "./workflows/git.js";
+} from "./workflows/templates";
+import { installDependencies } from "./workflows/install";
+import { setupDatabase, setupExternalDatabase } from "./workflows/database";
+import { initializeGit } from "./workflows/git";
 import {
   performPreFlightChecks,
   validateProject,
   displayManualSetupInstructions,
   displaySuccessMessage,
-} from "./workflows/validation.js";
+} from "./workflows/validation";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-import type { ProjectOptions } from "./types.js";
+import type { ProjectOptions } from "./types";
 
 export async function createProject(
   projectName: string,
   cliOptions: Partial<ProjectOptions>
 ) {
+  const startTime = Date.now();
   const projectPath = resolve(process.cwd(), projectName);
+
+  // Show welcome message
+  logger.title(`Creating ${projectName}`);
 
   // Enhanced pre-flight checks
   await performPreFlightChecks(projectPath, cliOptions);
@@ -47,8 +50,19 @@ export async function createProject(
   // Prompt for missing options
   const options = await promptForOptions(cliOptions);
 
+  // Show project configuration
+  const config = {
+    Project: projectName,
+    Database: options.db.toUpperCase(),
+    ORM: options.orm === "prisma" ? "Prisma" : "None",
+    Linter: options.lint === "biome" ? "Biome" : "ESLint",
+    Git: options.git ? "Yes" : "No",
+    Install: options.install ? "Yes" : "No",
+  };
+  logger.summary(projectName, config);
+
   // Create project directory with enhanced error handling
-  const spinner = ora("Creating project directory...").start();
+  const spinner = logger.spinner("Creating project directory...");
   try {
     mkdirSync(projectPath, { recursive: true });
     spinner.succeed("Created project directory");
@@ -86,10 +100,8 @@ export async function createProject(
       await setupExternalDatabase(projectPath, spinner, options);
     }
   } else if (options.orm === "prisma" && !dependenciesInstalled) {
-    console.log(
-      chalk.yellow(
-        "⚠️  Skipping database setup because dependencies installation failed"
-      )
+    logger.warn(
+      "Skipping database setup because dependencies installation failed"
     );
   }
 
@@ -99,14 +111,85 @@ export async function createProject(
   }
 
   // Validate project setup
-  spinner.start("Validating project setup...");
+  const validationSpinner = logger.spinner("Validating project setup...");
   const hasErrors = await validateProject(projectPath, options);
 
   if (hasErrors) {
-    spinner.fail("Project created with issues");
+    validationSpinner.fail("Project created with issues");
     displayManualSetupInstructions(projectName, options);
   } else {
-    spinner.succeed("Project validated successfully");
-    displaySuccessMessage(projectName, options);
+    validationSpinner.succeed("Project validated successfully");
+
+    // Calculate completion time
+    const completionTime = Date.now() - startTime;
+
+    // Show completion message
+    logger.completion(projectName, completionTime);
+
+    // Show what was included
+    const includedFeatures = [
+      "Fastify API server (apps/api)",
+      "React Router 7 web app (apps/web)",
+      "Shared TypeScript config & utilities",
+    ];
+
+    if (options.orm === "prisma") {
+      includedFeatures.push(
+        `Prisma ORM with ${options.db.toUpperCase()} database`
+      );
+    }
+
+    includedFeatures.push(
+      `${options.lint === "biome" ? "Biome" : "ESLint"} for code quality`
+    );
+
+    logger.box("What's included", includedFeatures);
+
+    // Show next steps
+    const steps = [
+      {
+        title: "Navigate to your project",
+        command: `cd ${projectName}`,
+      },
+      {
+        title: "Start development servers",
+        command: "pnpm dev",
+        description:
+          "This will start both API (port 3001) and web (port 3000) servers",
+      },
+    ];
+
+    // Add conditional steps
+    if (!options.install) {
+      steps.splice(1, 0, {
+        title: "Install dependencies",
+        command: "pnpm install",
+      });
+    }
+
+    if (options.orm === "prisma" && options.db !== "sqlite") {
+      steps.splice(-1, 0, {
+        title: "Configure your database",
+        command: "# Edit .env file",
+        description: `Update DATABASE_URL in .env for ${options.db.toUpperCase()}`,
+      });
+    }
+
+    logger.nextSteps(projectName, steps);
+
+    // Show useful commands
+    logger.section("Useful commands:");
+    logger.command("pnpm dev          # Start both API and web in development");
+    logger.command("pnpm build        # Build for production");
+    logger.command("pnpm lint         # Run linter");
+    logger.command("pnpm format       # Format code");
+
+    if (options.orm === "prisma") {
+      logger.command("pnpm db:studio    # Open Prisma Studio");
+    }
+
+    logger.break();
+    logger.dim("💡 Check the README.md for more detailed instructions");
+    logger.success("Happy coding! 🚀");
   }
 }

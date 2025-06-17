@@ -1,6 +1,6 @@
 import { execa, type ExecaError } from "execa";
 import type { Ora } from "ora";
-import { handlePackageManagerError } from "../helpers/error-handling.js";
+import { handlePackageManagerError } from "../helpers/error-handling";
 
 /**
  * Handle dependency installation with enhanced error handling

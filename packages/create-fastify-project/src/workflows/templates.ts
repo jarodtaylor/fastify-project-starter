@@ -3,17 +3,17 @@ import { readdir, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { Ora } from "ora";
 import chalk from "chalk";
-import { copyTemplate } from "../helpers/copy-template.js";
-import { replaceTemplateVars } from "../helpers/replace-vars.js";
-import { handleFileSystemError } from "../helpers/error-handling.js";
+import { copyTemplate } from "../helpers/copy-template";
+import { replaceTemplateVars } from "../helpers/replace-vars";
+import { handleFileSystemError } from "../helpers/error-handling";
 import {
   fetchLatestVersions,
   extractCurrentVersions,
   updatePackageVersions,
   displayVersionUpdates,
-} from "../helpers/version-fetcher.js";
+} from "../helpers/version-fetcher";
 
-import type { ProjectOptions } from "../helpers/types.js";
+import type { ProjectOptions } from "../types";
 
 /**
  * Copy template files to project directory
