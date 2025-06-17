@@ -21,9 +21,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: "10.11.1"
           run_install: false
 
       - name: ✅ Validate pnpm Installation

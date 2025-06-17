@@ -56,14 +56,15 @@ jobs:
           pnpm install
           cd packages/create-fastify-project && pnpm install
 
-      - name: 🏗️ Build CLI
+      - name: 🏗️ Build CLI (tsup)
         run: |
           cd packages/create-fastify-project
-          echo "🔨 Building CLI..."
+          echo "🔨 Building CLI with tsup..."
           pnpm build
 
           echo "📁 Build output verification:"
           ls -la dist/ || echo "❌ No dist directory created"
+          test -f dist/index.js || { echo "❌ dist/index.js not found"; exit 1; }
 
       - name: 🧪 Test CLI functionality
         run: |

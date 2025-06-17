@@ -45,16 +45,16 @@ jobs:
 
           echo "✅ Version sync confirmed: $TAG_VERSION"
 
-      - name: 🏗️ Build CLI
+      - name: 🏗️ Build CLI (tsup)
         run: |
           cd packages/create-fastify-project
-          echo "🔨 Building CLI..."
+          echo "🔨 Building CLI with tsup..."
           pnpm build
 
           echo "📁 Build output verification:"
           ls -la dist/ || echo "❌ No dist directory created"
-          echo "📄 Files in dist:"
-          find dist/ -type f -name "*.js" 2>/dev/null || echo "❌ No JS files found in dist"
+          test -f dist/index.js || { echo "❌ dist/index.js not found"; exit 1; }
+          echo "✅ Bundled CLI created: $(ls -lh dist/index.js | awk '{print $5}') dist/index.js"
 
       - name: 🧪 Test CLI functionality
         run: |
@@ -68,16 +68,16 @@ jobs:
             echo "✅ dist/index.js exists"
             echo "📄 File permissions:"
             ls -la dist/index.js
-            
+
             # Test version command from the package directory
             echo "🧪 Testing version command from package directory:"
             VERSION_OUTPUT=$(node dist/index.js --version)
             echo "CLI reports version: $VERSION_OUTPUT"
-            
+
             # Test help command
             echo "🧪 Testing help command:"
             node dist/index.js --help || echo "❌ Help command failed"
-            
+
           else
             echo "❌ dist/index.js is missing"
             exit 1
