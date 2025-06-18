@@ -101,19 +101,28 @@ logger.step("npm run dev");
 
 ## 🔮 **Future Phases (Post-Phase 4)**
 
-### **Phase 5: Testing Infrastructure**
+### **Phase 5: Template System Refactor** - CRITICAL
+
+- **Problem**: Dual template system causing synchronization issues
+  - `/templates/react-router/` - Development workspace
+  - `/packages/create-fastify-project/template/` - Packaged template
+  - Files can get out of sync (caused v1.1.1 database setup bug)
+- **Solution**: Consolidate to single template system like Next.js
+- **Benefits**: Eliminates sync issues, simpler maintenance, clearer architecture
+
+### **Phase 6: Testing Infrastructure**
 
 - Unit tests for all helpers and workflows
 - Integration tests for CLI flows
 - Fixture-based template testing
 
-### **Phase 6: Multi-Command Architecture**
+### **Phase 7: Multi-Command Architecture**
 
 - Support for `npx create-fastify-project add <feature>`
 - Project detection and modification
 - Feature registry system
 
-### **Phase 7: Advanced Features**
+### **Phase 8: Advanced Features**
 
 - User preference persistence
 - Offline template caching
@@ -129,6 +138,7 @@ logger.step("npm run dev");
 - ✅ Always-fresh package versions
 - ✅ Clean, maintainable architecture
 - ✅ Future-proof command structure
+- ✅ Fixed v1.1.1 database setup bug (missing .env.example sync issue)
 
 ### **Phase 4 Targets**
 

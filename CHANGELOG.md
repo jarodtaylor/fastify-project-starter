@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2025-01-11
+
+### Fixed
+
+- **CRITICAL**: Added missing `.env.example` file to packaged CLI template (`packages/create-fastify-project/template/packages/database/.env.example`)
+- Resolved database setup failure caused by template synchronization issue between development and packaged templates
+- Fixed `cp: packages/database/.env.example: No such file or directory` error during project creation
+
+### Documentation
+
+- Updated REFACTOR.md to document dual template system architectural issue for future refactoring
+- Added Phase 5 planning for template system consolidation
+
 ## [1.1.1] - 2025-01-11
 
 ### Fixed
@@ -85,7 +98,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript support throughout
 - Git initialization and dependency installation
 
-[Unreleased]: https://github.com/jarodtaylor/fastify-project-starter/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/jarodtaylor/fastify-project-starter/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/jarodtaylor/fastify-project-starter/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/jarodtaylor/fastify-project-starter/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/jarodtaylor/fastify-project-starter/compare/v1.0.13...v1.1.0
 [1.0.13]: https://github.com/jarodtaylor/fastify-project-starter/compare/v1.0.0...v1.0.13
 [1.0.0]: https://github.com/jarodtaylor/fastify-project-starter/releases/tag/v1.0.0
