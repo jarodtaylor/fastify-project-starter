@@ -14,7 +14,7 @@ import type { ProjectOptions } from "../types";
 export async function setupDatabase(
   projectPath: string,
   spinner: Ora,
-  options: ProjectOptions
+  options: ProjectOptions,
 ): Promise<void> {
   spinner.start("Setting up database...");
   try {
@@ -63,7 +63,7 @@ export async function setupDatabase(
           helpUrl:
             "https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch",
         },
-        error as Error
+        error as Error,
       );
     } else {
       enhancedError = handlePackageManagerError(error as ExecaError, {
@@ -83,7 +83,7 @@ export async function setupDatabase(
 export async function setupExternalDatabase(
   projectPath: string,
   spinner: Ora,
-  options: ProjectOptions
+  options: ProjectOptions,
 ): Promise<void> {
   spinner.start("Setting up database configuration...");
   try {
@@ -101,22 +101,24 @@ export async function setupExternalDatabase(
 
     // Display database-specific setup instructions
     console.log(
-      chalk.yellow(`\n🗄️  ${options.db.toUpperCase()} Database Setup Required:`)
+      chalk.yellow(`\n🗄️  ${options.db.toUpperCase()} Database Setup Required:`),
     );
     console.log(chalk.cyan("   1. Set up your database server"));
     console.log(
       chalk.cyan(
-        `   2. Update DATABASE_URL in .env with your ${options.db} connection string`
-      )
+        `   2. Update DATABASE_URL in .env with your ${options.db} connection string`,
+      ),
     );
     console.log(
-      chalk.cyan("   3. Run: cd packages/database && pnpm prisma db push")
+      chalk.cyan("   3. Run: cd packages/database && pnpm prisma db push"),
     );
     console.log(chalk.dim("   💡 See README.md for database setup examples"));
   } catch (error) {
     spinner.fail("Failed to set up database configuration");
     console.log(
-      chalk.red(`❌ Database configuration failed: ${(error as Error).message}`)
+      chalk.red(
+        `❌ Database configuration failed: ${(error as Error).message}`,
+      ),
     );
     console.log(chalk.yellow("\n🔧 Manual setup required:"));
     console.log(chalk.cyan("   cp .env.example .env  # From project root"));
