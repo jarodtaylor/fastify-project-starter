@@ -18,7 +18,7 @@ export interface VersionFetchOptions {
  */
 async function fetchPackageVersion(
   packageName: string,
-  options: VersionFetchOptions = {}
+  options: VersionFetchOptions = {},
 ): Promise<string | null> {
   const { timeout = 5000, registryUrl = "https://registry.npmjs.org" } =
     options;
@@ -82,7 +82,7 @@ function satisfiesConstraint(version: string, constraint: string): boolean {
   // Simple major version check - in production, you'd use semver
   const versionMajor = Number.parseInt(version.split(".")[0]);
   const constraintMajor = Number.parseInt(
-    constraint.replace(/[\^~]/, "").split(".")[0]
+    constraint.replace(/[\^~]/, "").split(".")[0],
   );
 
   return versionMajor === constraintMajor;
@@ -94,7 +94,7 @@ function satisfiesConstraint(version: string, constraint: string): boolean {
 export async function fetchLatestVersions(
   packages: string[],
   currentVersions: Record<string, string> = {},
-  options: VersionFetchOptions = {}
+  options: VersionFetchOptions = {},
 ): Promise<VersionInfo[]> {
   const results: VersionInfo[] = [];
 
@@ -128,7 +128,7 @@ export async function fetchLatestVersions(
         latest: latestVersion,
         updated: shouldUpdate && finalVersion !== currentVersion,
       };
-    }
+    },
   );
 
   try {
@@ -136,7 +136,7 @@ export async function fetchLatestVersions(
     results.push(...fetchResults);
   } catch (error) {
     console.log(
-      chalk.yellow("⚠️  Some version checks failed, using template versions")
+      chalk.yellow("⚠️  Some version checks failed, using template versions"),
     );
   }
 
@@ -147,7 +147,7 @@ export async function fetchLatestVersions(
  * Extracts current versions from package.json content
  */
 export function extractCurrentVersions(
-  packageJsonContent: string
+  packageJsonContent: string,
 ): Record<string, string> {
   try {
     const packageJson = JSON.parse(packageJsonContent);
@@ -177,7 +177,7 @@ export function extractCurrentVersions(
  */
 export function updatePackageVersions(
   packageJsonContent: string,
-  versionUpdates: VersionInfo[]
+  versionUpdates: VersionInfo[],
 ): string {
   try {
     const packageJson = JSON.parse(packageJsonContent);
@@ -223,7 +223,7 @@ export function displayVersionUpdates(versionUpdates: VersionInfo[]): void {
   console.log(chalk.blue("📦 Updated to latest versions:"));
   for (const update of updates) {
     console.log(
-      chalk.blue(`   • ${update.name}: ${update.current} → ${update.latest}`)
+      chalk.blue(`   • ${update.name}: ${update.current} → ${update.latest}`),
     );
   }
   console.log(); // Extra spacing

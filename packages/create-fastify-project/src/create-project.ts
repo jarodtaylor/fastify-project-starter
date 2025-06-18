@@ -2,32 +2,32 @@ import { existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type ExecaError, execa } from "execa";
+import {
+  EnhancedError,
+  checkFileSystemHealth,
+  handleFileSystemError,
+  handleGitError,
+  handlePackageManagerError,
+} from "./helpers/error-handling";
 import { logger } from "./helpers/logger";
 import { promptForOptions } from "./helpers/prompts";
 import {
-  validateProjectOptions,
   checkNetworkEnvironment,
+  validateProjectOptions,
 } from "./helpers/validation";
-import {
-  checkFileSystemHealth,
-  EnhancedError,
-  handleFileSystemError,
-  handlePackageManagerError,
-  handleGitError,
-} from "./helpers/error-handling";
+import { setupDatabase, setupExternalDatabase } from "./workflows/database";
+import { initializeGit } from "./workflows/git";
+import { installDependencies } from "./workflows/install";
 import {
   copyTemplateFiles,
   customizeTemplate,
   updateVersions,
 } from "./workflows/templates";
-import { installDependencies } from "./workflows/install";
-import { setupDatabase, setupExternalDatabase } from "./workflows/database";
-import { initializeGit } from "./workflows/git";
 import {
-  performPreFlightChecks,
-  validateProject,
   displayManualSetupInstructions,
   displaySuccessMessage,
+  performPreFlightChecks,
+  validateProject,
 } from "./workflows/validation";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -36,7 +36,7 @@ import type { ProjectOptions } from "./types";
 
 export async function createProject(
   projectName: string,
-  cliOptions: Partial<ProjectOptions>
+  cliOptions: Partial<ProjectOptions>,
 ) {
   const startTime = Date.now();
   const projectPath = resolve(process.cwd(), projectName);
@@ -101,7 +101,7 @@ export async function createProject(
     }
   } else if (options.orm === "prisma" && !dependenciesInstalled) {
     logger.warn(
-      "Skipping database setup because dependencies installation failed"
+      "Skipping database setup because dependencies installation failed",
     );
   }
 
@@ -135,12 +135,12 @@ export async function createProject(
 
     if (options.orm === "prisma") {
       includedFeatures.push(
-        `Prisma ORM with ${options.db.toUpperCase()} database`
+        `Prisma ORM with ${options.db.toUpperCase()} database`,
       );
     }
 
     includedFeatures.push(
-      `${options.lint === "biome" ? "Biome" : "ESLint"} for code quality`
+      `${options.lint === "biome" ? "Biome" : "ESLint"} for code quality`,
     );
 
     logger.box("What's included", includedFeatures);

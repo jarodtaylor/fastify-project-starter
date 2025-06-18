@@ -12,7 +12,7 @@ const MAX_PROJECT_NAME_LENGTH = 214; // npm package name limit
  * Enhanced project name validation with better error handling
  */
 export async function validateProjectName(
-  providedName?: string
+  providedName?: string,
 ): Promise<string> {
   if (providedName) {
     const validationResult = validateProjectNameString(providedName);
@@ -92,7 +92,7 @@ function validateProjectNameString(name: string): {
     return {
       isValid: false,
       error: `Invalid project name for npm: ${issues.join(
-        ", "
+        ", ",
       )}. Consider using lowercase letters, numbers, and dashes only.`,
     };
   }
@@ -123,21 +123,21 @@ export function validateProjectOptions(options: Partial<ProjectOptions>): void {
   // Validate database option
   if (options.db && !["sqlite", "postgres", "mysql"].includes(options.db)) {
     errors.push(
-      `Invalid database option: "${options.db}". Must be one of: sqlite, postgres, mysql`
+      `Invalid database option: "${options.db}". Must be one of: sqlite, postgres, mysql`,
     );
   }
 
   // Validate ORM option
   if (options.orm && !["prisma", "none"].includes(options.orm)) {
     errors.push(
-      `Invalid ORM option: "${options.orm}". Must be one of: prisma, none`
+      `Invalid ORM option: "${options.orm}". Must be one of: prisma, none`,
     );
   }
 
   // Validate linter option
   if (options.lint && !["biome", "eslint"].includes(options.lint)) {
     errors.push(
-      `Invalid linter option: "${options.lint}". Must be one of: biome, eslint`
+      `Invalid linter option: "${options.lint}". Must be one of: biome, eslint`,
     );
   }
 
@@ -153,14 +153,14 @@ export function validateProjectOptions(options: Partial<ProjectOptions>): void {
   // Throw all errors at once for better UX
   if (errors.length > 0) {
     throw new Error(
-      `Validation errors:\n${errors.map((e) => `  • ${e}`).join("\n")}`
+      `Validation errors:\n${errors.map((e) => `  • ${e}`).join("\n")}`,
     );
   }
 
   // Validate logical combinations (warnings, not errors)
   if (options.orm === "none" && options.db && options.db !== "sqlite") {
     console.warn(
-      "⚠️  Warning: Database option is ignored when ORM is set to 'none'"
+      "⚠️  Warning: Database option is ignored when ORM is set to 'none'",
     );
   }
 }

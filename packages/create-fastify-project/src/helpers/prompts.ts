@@ -1,5 +1,5 @@
-import prompts from "prompts";
 import chalk from "chalk";
+import prompts from "prompts";
 import type { ProjectOptions } from "../types";
 
 export interface InteractiveOptions extends ProjectOptions {
@@ -10,7 +10,7 @@ export interface InteractiveOptions extends ProjectOptions {
  * Prompt for missing options interactively
  */
 export async function promptForOptions(
-  cliOptions: Partial<ProjectOptions>
+  cliOptions: Partial<ProjectOptions>,
 ): Promise<ProjectOptions> {
   // If all options are provided via CLI, skip interactive prompts
   const hasAllOptions =
@@ -157,8 +157,8 @@ export async function promptForProjectName(): Promise<string> {
   console.log(chalk.blue.bold("🚀 Create Fastify Project"));
   console.log(
     chalk.gray(
-      "A modern monorepo template with Fastify API + React Router 7 frontend\n"
-    )
+      "A modern monorepo template with Fastify API + React Router 7 frontend\n",
+    ),
   );
 
   const response = await prompts(
@@ -182,7 +182,7 @@ export async function promptForProjectName(): Promise<string> {
         console.log(chalk.red("\n❌ Operation cancelled"));
         process.exit(1);
       },
-    }
+    },
   );
 
   return response.projectName;

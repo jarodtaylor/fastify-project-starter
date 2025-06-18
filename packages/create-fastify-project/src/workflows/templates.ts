@@ -1,16 +1,16 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { Ora } from "ora";
 import chalk from "chalk";
+import type { Ora } from "ora";
 import { copyTemplate } from "../helpers/copy-template";
-import { replaceTemplateVars } from "../helpers/replace-vars";
 import { handleFileSystemError } from "../helpers/error-handling";
+import { replaceTemplateVars } from "../helpers/replace-vars";
 import {
-  fetchLatestVersions,
-  extractCurrentVersions,
-  updatePackageVersions,
   displayVersionUpdates,
+  extractCurrentVersions,
+  fetchLatestVersions,
+  updatePackageVersions,
 } from "../helpers/version-fetcher";
 
 import type { ProjectOptions } from "../types";
@@ -22,7 +22,7 @@ export async function copyTemplateFiles(
   templatePath: string,
   projectPath: string,
   options: ProjectOptions,
-  spinner: Ora
+  spinner: Ora,
 ): Promise<void> {
   spinner.start("Copying template files...");
   try {
@@ -47,7 +47,7 @@ export async function customizeTemplate(
   projectPath: string,
   projectName: string,
   options: ProjectOptions,
-  spinner: Ora
+  spinner: Ora,
 ): Promise<void> {
   spinner.start("Customizing template...");
   try {
@@ -70,7 +70,7 @@ export async function customizeTemplate(
  */
 export async function updateVersions(
   projectPath: string,
-  spinner: Ora
+  spinner: Ora,
 ): Promise<void> {
   spinner.start("Checking for latest package versions...");
 
@@ -111,13 +111,13 @@ export async function updateVersions(
           const versionUpdates = await fetchLatestVersions(
             packagesToCheck,
             currentVersions,
-            { timeout: 3000 }
+            { timeout: 3000 },
           );
 
           // Update package.json content
           const updatedContent = updatePackageVersions(
             packageJsonContent,
-            versionUpdates
+            versionUpdates,
           );
 
           if (updatedContent !== packageJsonContent) {
@@ -152,7 +152,7 @@ export async function updateVersions(
 
         const versionUpdates = await fetchLatestVersions(
           packagesToCheck,
-          currentVersions
+          currentVersions,
         );
         displayVersionUpdates(versionUpdates);
       }
@@ -163,8 +163,8 @@ export async function updateVersions(
     spinner.warn("Version check failed, continuing with template versions");
     console.log(
       chalk.yellow(
-        "⚠️  Unable to check for latest versions, using template defaults"
-      )
+        "⚠️  Unable to check for latest versions, using template defaults",
+      ),
     );
   }
 }

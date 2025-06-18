@@ -4,14 +4,14 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command, Option } from "commander";
-import { logger } from "./helpers/logger";
 import { createProject } from "./create-project";
-import { validateProjectName } from "./helpers/validation";
+import { logger } from "./helpers/logger";
 import { runInteractiveMode } from "./helpers/prompts";
+import { validateProjectName } from "./helpers/validation";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageJson = JSON.parse(
-  readFileSync(resolve(__dirname, "../package.json"), "utf-8")
+  readFileSync(resolve(__dirname, "../package.json"), "utf-8"),
 );
 
 // Create the main program
@@ -25,23 +25,23 @@ program
   .helpOption("-h, --help", "Display help for command")
   .argument("[project-name]", "Name of the project to create")
   .addOption(
-    new Option("--no-install", "Skip dependency installation").default(true)
+    new Option("--no-install", "Skip dependency installation").default(true),
   )
   .addOption(new Option("--no-git", "Skip git initialization").default(true))
   .addOption(
     new Option("--orm <orm>", "ORM to use")
       .choices(["prisma", "none"])
-      .default("prisma")
+      .default("prisma"),
   )
   .addOption(
     new Option("--db <database>", "Database to use")
       .choices(["sqlite", "postgres", "mysql"])
-      .default("sqlite")
+      .default("sqlite"),
   )
   .addOption(
     new Option("--lint <linter>", "Linter to use")
       .choices(["biome", "eslint"])
-      .default("biome")
+      .default("biome"),
   )
   .action(async (projectName, options) => {
     try {
@@ -50,7 +50,7 @@ program
         // Full interactive mode - prompt for project name and all options
         logger.title("🚀 Create Fastify Project");
         logger.dim(
-          "A modern monorepo template with Fastify API + React Router 7 frontend"
+          "A modern monorepo template with Fastify API + React Router 7 frontend",
         );
         logger.break();
 
@@ -68,7 +68,7 @@ program
         // Traditional CLI mode with optional interactive prompts for missing options
         logger.title("🚀 Create Fastify Project");
         logger.dim(
-          "A modern monorepo template with Fastify API + React Router 7 frontend"
+          "A modern monorepo template with Fastify API + React Router 7 frontend",
         );
         logger.break();
 
@@ -82,7 +82,7 @@ program
       // Success/error messaging is now handled in createProject
     } catch (error) {
       logger.error(
-        error instanceof Error ? error.message : "Unknown error occurred"
+        error instanceof Error ? error.message : "Unknown error occurred",
       );
       process.exit(1);
     }
@@ -99,7 +99,7 @@ program.exitOverride((err) => {
   } else if (err.code === "commander.invalidArgument") {
     logger.error(`Invalid argument: ${err.message}`);
     logger.dim(
-      "Run 'npx create-fastify-project@latest --help' for usage information"
+      "Run 'npx create-fastify-project@latest --help' for usage information",
     );
     process.exit(1);
   } else if (
@@ -108,7 +108,7 @@ program.exitOverride((err) => {
   ) {
     logger.error(`Invalid option: ${err.message}`);
     logger.dim(
-      "Run 'npx create-fastify-project@latest --help' for usage information"
+      "Run 'npx create-fastify-project@latest --help' for usage information",
     );
     process.exit(1);
   } else {

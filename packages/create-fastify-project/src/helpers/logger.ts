@@ -133,7 +133,7 @@ export class Logger {
   completion(projectName: string, timeMs: number): void {
     this.break();
     console.log(
-      chalk.green.bold(`🎉 Successfully created ${chalk.cyan(projectName)}`)
+      chalk.green.bold(`🎉 Successfully created ${chalk.cyan(projectName)}`),
     );
     console.log(chalk.dim(`   Completed in ${timeMs}ms`));
     this.break();
@@ -144,7 +144,7 @@ export class Logger {
    */
   nextSteps(
     projectName: string,
-    steps: Array<{ title: string; command?: string; description?: string }>
+    steps: Array<{ title: string; command?: string; description?: string }>,
   ): void {
     this.section("Next steps:");
 

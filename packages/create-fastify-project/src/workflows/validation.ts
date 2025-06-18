@@ -1,15 +1,15 @@
-import { access, constants } from "node:fs/promises";
 import { existsSync, mkdirSync } from "node:fs";
+import { constants, access } from "node:fs/promises";
 import { resolve } from "node:path";
 import chalk from "chalk";
+import {
+  EnhancedError,
+  checkFileSystemHealth,
+} from "../helpers/error-handling";
 import { logger } from "../helpers/logger";
 import {
-  checkFileSystemHealth,
-  EnhancedError,
-} from "../helpers/error-handling";
-import {
-  validateProjectOptions,
   checkNetworkEnvironment,
+  validateProjectOptions,
 } from "../helpers/validation";
 import type { ProjectOptions } from "../types";
 
@@ -18,7 +18,7 @@ import type { ProjectOptions } from "../types";
  */
 export async function performPreFlightChecks(
   projectPath: string,
-  cliOptions: Partial<ProjectOptions>
+  cliOptions: Partial<ProjectOptions>,
 ): Promise<void> {
   // Check if directory exists
   if (existsSync(projectPath)) {
@@ -46,7 +46,7 @@ export async function performPreFlightChecks(
           "On Unix systems, check permissions with: ls -la",
           "Ensure sufficient disk space is available",
         ],
-      }
+      },
     );
     error.display();
     process.exit(1);
@@ -76,7 +76,7 @@ export async function performPreFlightChecks(
  */
 export async function validateProject(
   projectPath: string,
-  options: ProjectOptions
+  options: ProjectOptions,
 ): Promise<boolean> {
   let hasErrors = false;
 
@@ -123,7 +123,7 @@ export async function validateProject(
  */
 export function displayManualSetupInstructions(
   projectName: string,
-  options: ProjectOptions
+  options: ProjectOptions,
 ): void {
   logger.warn("Manual setup required");
 
@@ -171,7 +171,7 @@ export function displayManualSetupInstructions(
       {
         title: "Return to project root",
         command: "cd ../..",
-      }
+      },
     );
   }
 
@@ -184,7 +184,7 @@ export function displayManualSetupInstructions(
       {
         title: "Make initial commit",
         command: "git add . && git commit -m 'Initial commit'",
-      }
+      },
     );
   }
 
@@ -203,7 +203,7 @@ export function displayManualSetupInstructions(
  */
 export function displaySuccessMessage(
   projectName: string,
-  options: ProjectOptions
+  options: ProjectOptions,
 ): void {
   // This function is deprecated in favor of the enhanced logger system
   // in create-project.ts, but keeping for backwards compatibility
@@ -219,18 +219,18 @@ export function displaySuccessMessage(
   console.log(chalk.dim("   • Shared TypeScript config & utilities"));
   if (options.orm === "prisma") {
     console.log(
-      chalk.dim(`   • Prisma ORM with ${options.db.toUpperCase()} database`)
+      chalk.dim(`   • Prisma ORM with ${options.db.toUpperCase()} database`),
     );
   }
   console.log(
     chalk.dim(
-      `   • ${options.lint === "biome" ? "Biome" : "ESLint"} for code quality`
-    )
+      `   • ${options.lint === "biome" ? "Biome" : "ESLint"} for code quality`,
+    ),
   );
 
   console.log(chalk.cyan("\n🔗 Useful commands:"));
   console.log(
-    chalk.cyan("   pnpm dev          # Start both API and web in development")
+    chalk.cyan("   pnpm dev          # Start both API and web in development"),
   );
   console.log(chalk.cyan("   pnpm build        # Build for production"));
   console.log(chalk.cyan("   pnpm lint         # Run linter"));
@@ -240,7 +240,7 @@ export function displaySuccessMessage(
   }
 
   console.log(
-    chalk.dim("\n💡 Check the README.md for more detailed instructions")
+    chalk.dim("\n💡 Check the README.md for more detailed instructions"),
   );
   console.log(chalk.green("\nHappy coding! 🚀"));
 }

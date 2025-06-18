@@ -1,4 +1,4 @@
-import { execa, type ExecaError } from "execa";
+import { type ExecaError, execa } from "execa";
 import type { Ora } from "ora";
 import { handleGitError } from "../helpers/error-handling";
 
@@ -7,7 +7,7 @@ import { handleGitError } from "../helpers/error-handling";
  */
 export async function initializeGit(
   projectPath: string,
-  spinner: Ora
+  spinner: Ora,
 ): Promise<void> {
   spinner.start("Initializing git repository...");
   try {

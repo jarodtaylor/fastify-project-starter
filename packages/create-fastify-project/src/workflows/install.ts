@@ -1,4 +1,4 @@
-import { execa, type ExecaError } from "execa";
+import { type ExecaError, execa } from "execa";
 import type { Ora } from "ora";
 import { handlePackageManagerError } from "../helpers/error-handling";
 
@@ -7,7 +7,7 @@ import { handlePackageManagerError } from "../helpers/error-handling";
  */
 export async function installDependencies(
   projectPath: string,
-  spinner: Ora
+  spinner: Ora,
 ): Promise<boolean> {
   spinner.start("Installing dependencies...");
   try {
@@ -21,7 +21,7 @@ export async function installDependencies(
       spinner.succeed("Formatted generated code");
     } catch (error) {
       spinner.warn(
-        "Could not format generated code (this is usually not critical)"
+        "Could not format generated code (this is usually not critical)",
       );
     }
 
