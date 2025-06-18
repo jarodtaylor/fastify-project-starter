@@ -132,8 +132,18 @@ export async function fetchLatestVersions(
   );
 
   try {
-    const fetchResults = await Promise.all(fetchPromises);
-    results.push(...fetchResults);
+    const fetchResults = await Promise.allSettled(fetchPromises);
+    for (const result of fetchResults) {
+      if (result.status === "fulfilled") {
+        results.push(result.value);
+      } else {
+        console.log(
+          chalk.yellow(
+            `⚠️  Failed to fetch version for a package: ${result.reason}`,
+          ),
+        );
+      }
+    }
   } catch (error) {
     console.log(
       chalk.yellow("⚠️  Some version checks failed, using template versions"),

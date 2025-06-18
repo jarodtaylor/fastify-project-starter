@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import prompts from "prompts";
 import type { ProjectOptions } from "../types";
+import { logger } from "./logger";
 
 export interface InteractiveOptions extends ProjectOptions {
   projectName: string;
@@ -30,7 +31,7 @@ export async function promptForOptions(
     };
   }
 
-  console.log(chalk.gray("Let's set up your Fastify project...\n"));
+  logger.dim("Let's set up your Fastify project...\n");
 
   const questions: prompts.PromptObject[] = [];
 
@@ -131,7 +132,7 @@ export async function promptForOptions(
   if (questions.length > 0) {
     answers = await prompts(questions, {
       onCancel: () => {
-        console.log(chalk.red("\n❌ Operation cancelled"));
+        logger.error("\n❌ Operation cancelled");
         process.exit(1);
       },
     });
@@ -154,11 +155,9 @@ export async function promptForOptions(
  * Interactive prompt for project name when not provided
  */
 export async function promptForProjectName(): Promise<string> {
-  console.log(chalk.blue.bold("🚀 Create Fastify Project"));
-  console.log(
-    chalk.gray(
-      "A modern monorepo template with Fastify API + React Router 7 frontend\n",
-    ),
+  logger.title("🚀 Create Fastify Project");
+  logger.dim(
+    "A modern monorepo template with Fastify API + React Router 7 frontend\n",
   );
 
   const response = await prompts(
@@ -179,7 +178,7 @@ export async function promptForProjectName(): Promise<string> {
     },
     {
       onCancel: () => {
-        console.log(chalk.red("\n❌ Operation cancelled"));
+        logger.error("\n❌ Operation cancelled");
         process.exit(1);
       },
     },
