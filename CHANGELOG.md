@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2025-06-18
+## [1.1.1] - 2025-01-11
+
+### Fixed
+
+- Added missing `.env.example` file to database package template with SQLite/PostgreSQL/MySQL examples
+- Fixed database workflow to copy `.env.example` from correct location (`packages/database/.env.example`)
+- Resolved Prisma `DATABASE_URL` environment variable error during project creation
+- Added `.cursorignore` to improve development tooling support for `.env.example` files
+
+## [1.1.0] - 2025-01-11
 
 ### Added
 
