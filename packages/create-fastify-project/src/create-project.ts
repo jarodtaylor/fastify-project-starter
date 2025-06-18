@@ -1,40 +1,48 @@
 import { existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import chalk from "chalk";
 import { type ExecaError, execa } from "execa";
-import ora, { type Ora } from "ora";
-import { copyTemplate } from "./utils/copy-template.js";
 import {
   EnhancedError,
   checkFileSystemHealth,
   handleFileSystemError,
   handleGitError,
-  handleNetworkError,
   handlePackageManagerError,
-} from "./utils/error-handling.js";
-import { promptForOptions } from "./utils/prompts.js";
-import { replaceTemplateVars } from "./utils/replace-vars.js";
+} from "./helpers/error-handling";
+import { logger } from "./helpers/logger";
+import { promptForOptions } from "./helpers/prompts";
 import {
   checkNetworkEnvironment,
   validateProjectOptions,
-} from "./utils/validation.js";
+} from "./helpers/validation";
+import { setupDatabase, setupExternalDatabase } from "./workflows/database";
+import { initializeGit } from "./workflows/git";
+import { installDependencies } from "./workflows/install";
+import {
+  copyTemplateFiles,
+  customizeTemplate,
+  updateVersions,
+} from "./workflows/templates";
+import {
+  displayManualSetupInstructions,
+  displaySuccessMessage,
+  performPreFlightChecks,
+  validateProject,
+} from "./workflows/validation";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export interface ProjectOptions {
-  install: boolean;
-  git: boolean;
-  orm: "prisma" | "none";
-  db: "sqlite" | "postgres" | "mysql";
-  lint: "biome" | "eslint";
-}
+import type { ProjectOptions } from "./types";
 
 export async function createProject(
   projectName: string,
   cliOptions: Partial<ProjectOptions>,
 ) {
+  const startTime = Date.now();
   const projectPath = resolve(process.cwd(), projectName);
+
+  // Show welcome message
+  logger.title(`Creating ${projectName}`);
 
   // Enhanced pre-flight checks
   await performPreFlightChecks(projectPath, cliOptions);
@@ -42,8 +50,19 @@ export async function createProject(
   // Prompt for missing options
   const options = await promptForOptions(cliOptions);
 
+  // Show project configuration
+  const config = {
+    Project: projectName,
+    Database: options.db.toUpperCase(),
+    ORM: options.orm === "prisma" ? "Prisma" : "None",
+    Linter: options.lint === "biome" ? "Biome" : "ESLint",
+    Git: options.git ? "Yes" : "No",
+    Install: options.install ? "Yes" : "No",
+  };
+  logger.summary(projectName, config);
+
   // Create project directory with enhanced error handling
-  const spinner = ora("Creating project directory...").start();
+  const spinner = logger.spinner("Creating project directory...");
   try {
     mkdirSync(projectPath, { recursive: true });
     spinner.succeed("Created project directory");
@@ -58,408 +77,119 @@ export async function createProject(
     process.exit(1);
   }
 
-  // Copy template files
-  spinner.start("Copying template files...");
-  try {
-    const templatePath = resolve(__dirname, "../template");
-    await copyTemplate(templatePath, projectPath, options);
-    spinner.succeed("Copied template files");
-  } catch (error) {
-    spinner.fail("Failed to copy template files");
-    const enhancedError = handleFileSystemError(error as Error, {
-      operation: "Template copying",
-      projectPath,
-      details: "Unable to copy template files to project directory",
-    });
-    enhancedError.display();
-    process.exit(1);
-  }
+  // Copy and customize template files
+  const templatePath = resolve(__dirname, "../template");
+  await copyTemplateFiles(templatePath, projectPath, options, spinner);
+  await customizeTemplate(projectPath, projectName, options, spinner);
 
-  // Replace template variables
-  spinner.start("Customizing template...");
-  try {
-    await replaceTemplateVars(projectPath, projectName, options);
-    spinner.succeed("Customized template");
-  } catch (error) {
-    spinner.fail("Failed to customize template");
-    const enhancedError = handleFileSystemError(error as Error, {
-      operation: "Template customization",
-      projectPath,
-      details: "Unable to customize template variables",
-    });
-    enhancedError.display();
-    process.exit(1);
-  }
+  // Update dependencies to latest versions
+  await updateVersions(projectPath, spinner);
 
   // Install dependencies with enhanced error handling
   let dependenciesInstalled = false;
   if (options.install) {
-    dependenciesInstalled = await handleDependencyInstallation(
-      projectPath,
-      spinner,
-    );
+    dependenciesInstalled = await installDependencies(projectPath, spinner);
   }
 
   // Initialize database (only for SQLite when dependencies are installed)
   if (options.orm === "prisma" && dependenciesInstalled) {
     if (options.db === "sqlite") {
-      await handleDatabaseSetup(projectPath, spinner, options);
+      await setupDatabase(projectPath, spinner, options);
     } else {
       // For PostgreSQL/MySQL, only do basic setup without connecting
-      await handleExternalDatabaseSetup(projectPath, spinner, options);
+      await setupExternalDatabase(projectPath, spinner, options);
     }
   } else if (options.orm === "prisma" && !dependenciesInstalled) {
-    console.log(
-      chalk.yellow(
-        "⚠️  Skipping database setup because dependencies installation failed",
-      ),
+    logger.warn(
+      "Skipping database setup because dependencies installation failed",
     );
   }
 
   // Initialize git with enhanced error handling
   if (options.git) {
-    await handleGitInitialization(projectPath, spinner);
+    await initializeGit(projectPath, spinner);
   }
 
   // Validate project setup
-  spinner.start("Validating project setup...");
+  const validationSpinner = logger.spinner("Validating project setup...");
   const hasErrors = await validateProject(projectPath, options);
 
   if (hasErrors) {
-    spinner.fail("Project created with issues");
+    validationSpinner.fail("Project created with issues");
     displayManualSetupInstructions(projectName, options);
   } else {
-    spinner.succeed("Project validated successfully");
-    displaySuccessMessage(projectName, options);
-  }
-}
+    validationSpinner.succeed("Project validated successfully");
 
-/**
- * Enhanced pre-flight checks before project creation
- */
-async function performPreFlightChecks(
-  projectPath: string,
-  cliOptions: Partial<ProjectOptions>,
-): Promise<void> {
-  // Check if directory exists
-  if (existsSync(projectPath)) {
-    throw new Error(`Directory "${projectPath}" already exists`);
-  }
+    // Calculate completion time
+    const completionTime = Date.now() - startTime;
 
-  // Validate CLI options early
-  validateProjectOptions(cliOptions);
+    // Show completion message
+    logger.completion(projectName, completionTime);
 
-  // Check file system health
-  const { canWrite, issues } = await checkFileSystemHealth(projectPath);
-  if (!canWrite) {
-    const error = new EnhancedError(
-      "Cannot write to target directory",
-      {
-        operation: "Pre-flight check",
-        projectPath,
-        details: issues.join("; "),
-      },
-      {
-        message: "File system permission issues detected",
-        steps: [
-          "Check if you have write permissions to the current directory",
-          "Try running from a directory where you have write access",
-          "On Unix systems, check permissions with: ls -la",
-          "Ensure sufficient disk space is available",
-        ],
-      },
+    // Show what was included
+    const includedFeatures = [
+      "Fastify API server (apps/api)",
+      "React Router 7 web app (apps/web)",
+      "Shared TypeScript config & utilities",
+    ];
+
+    if (options.orm === "prisma") {
+      includedFeatures.push(
+        `Prisma ORM with ${options.db.toUpperCase()} database`,
+      );
+    }
+
+    includedFeatures.push(
+      `${options.lint === "biome" ? "Biome" : "ESLint"} for code quality`,
     );
-    error.display();
-    process.exit(1);
-  }
 
-  if (issues.length > 0) {
-    console.log(chalk.yellow("⚠️  Warnings detected:"));
-    for (const issue of issues) {
-      console.log(chalk.yellow(`   • ${issue}`));
-    }
-    console.log(); // Extra spacing
-  }
+    logger.box("What's included", includedFeatures);
 
-  // Check network environment
-  const { warnings } = checkNetworkEnvironment();
-  if (warnings.length > 0) {
-    console.log(chalk.blue("ℹ️  Environment notes:"));
-    for (const warning of warnings) {
-      console.log(chalk.blue(`   • ${warning}`));
-    }
-    console.log(); // Extra spacing
-  }
-}
+    // Show next steps
+    const steps = [
+      {
+        title: "Navigate to your project",
+        command: `cd ${projectName}`,
+      },
+      {
+        title: "Start development servers",
+        command: "pnpm dev",
+        description:
+          "This will start both API (port 3001) and web (port 3000) servers",
+      },
+    ];
 
-/**
- * Handle dependency installation with enhanced error handling
- */
-async function handleDependencyInstallation(
-  projectPath: string,
-  spinner: Ora,
-): Promise<boolean> {
-  spinner.start("Installing dependencies...");
-  try {
-    await execa("pnpm", ["install"], { cwd: projectPath });
-    spinner.succeed("Installed dependencies");
-
-    // Format generated code after dependencies are installed
-    spinner.start("Formatting generated code...");
-    try {
-      await execa("pnpm", ["format"], { cwd: projectPath });
-      spinner.succeed("Formatted generated code");
-    } catch (error) {
-      spinner.warn(
-        "Could not format generated code (this is usually not critical)",
-      );
-    }
-
-    return true;
-  } catch (error) {
-    spinner.fail("Failed to install dependencies");
-    const enhancedError = handlePackageManagerError(error as ExecaError, {
-      operation: "Dependency installation",
-      projectPath,
-      command: "pnpm install",
-    });
-    enhancedError.display();
-    return false;
-  }
-}
-
-/**
- * Handle database setup with enhanced error handling
- */
-async function handleDatabaseSetup(
-  projectPath: string,
-  spinner: Ora,
-  options: ProjectOptions,
-): Promise<void> {
-  spinner.start("Setting up database...");
-  try {
-    // Copy .env file to root only (no database package duplication)
-    await execa("cp", [".env.example", ".env"], { cwd: projectPath });
-
-    // Generate Prisma client (run from database package directory)
-    await execa("pnpm", ["prisma", "generate"], {
-      cwd: resolve(projectPath, "packages/database"),
-    });
-
-    // Push database schema (run from database package directory)
-    await execa("pnpm", ["prisma", "db", "push"], {
-      cwd: resolve(projectPath, "packages/database"),
-    });
-
-    spinner.succeed("Set up database");
-  } catch (error) {
-    spinner.fail("Failed to set up database");
-
-    // Determine the specific type of error
-    const errorMessage = (error as Error).message?.toLowerCase() || "";
-    let enhancedError: EnhancedError;
-
-    if (errorMessage.includes("prisma") || errorMessage.includes("not found")) {
-      enhancedError = new EnhancedError(
-        "Prisma setup failed",
-        {
-          operation: "Database setup",
-          projectPath,
-          command: "prisma generate/db push",
-          details: (error as Error).message,
-        },
-        {
-          message: "Prisma database setup encountered issues",
-          steps: [
-            "The project was created successfully but database setup failed",
-            "You can set it up manually with the following commands:",
-            "cd packages/database",
-            "cp .env.example .env",
-            "pnpm prisma generate",
-            "pnpm prisma db push",
-          ],
-          helpUrl:
-            "https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch",
-        },
-        error as Error,
-      );
-    } else {
-      enhancedError = handlePackageManagerError(error as ExecaError, {
-        operation: "Database setup",
-        projectPath,
-        command: "prisma commands",
+    // Add conditional steps
+    if (!options.install) {
+      steps.splice(1, 0, {
+        title: "Install dependencies",
+        command: "pnpm install",
       });
     }
 
-    enhancedError.display();
-  }
-}
-
-/**
- * Handle external database setup (PostgreSQL/MySQL) - without attempting connection
- */
-async function handleExternalDatabaseSetup(
-  projectPath: string,
-  spinner: Ora,
-  options: ProjectOptions,
-): Promise<void> {
-  spinner.start("Setting up database configuration...");
-  try {
-    // Copy .env file to root only (no database package duplication)
-    await execa("cp", [".env.example", ".env"], { cwd: projectPath });
-
-    // Generate Prisma client (run from database package directory)
-    await execa("pnpm", ["prisma", "generate"], {
-      cwd: resolve(projectPath, "packages/database"),
-    });
-
-    spinner.succeed("Set up database configuration");
-
-    // Display database-specific setup instructions
-    console.log(
-      chalk.yellow(`\n🗄️  ${options.db.toUpperCase()} Database Setup Required:`),
-    );
-    console.log(chalk.cyan("   1. Set up your database server"));
-    console.log(
-      chalk.cyan(
-        `   2. Update DATABASE_URL in .env with your ${options.db} connection string`,
-      ),
-    );
-    console.log(
-      chalk.cyan("   3. Run: cd packages/database && pnpm prisma db push"),
-    );
-    console.log(chalk.dim("   💡 See README.md for database setup examples"));
-  } catch (error) {
-    spinner.fail("Failed to set up database configuration");
-    console.log(
-      chalk.red(
-        `❌ Database configuration failed: ${(error as Error).message}`,
-      ),
-    );
-    console.log(chalk.yellow("\n🔧 Manual setup required:"));
-    console.log(chalk.cyan("   cp .env.example .env  # From project root"));
-    console.log(chalk.cyan("   cd packages/database && pnpm prisma generate"));
-  }
-}
-
-/**
- * Handle git initialization with enhanced error handling
- */
-async function handleGitInitialization(
-  projectPath: string,
-  spinner: Ora,
-): Promise<void> {
-  spinner.start("Initializing git repository...");
-  try {
-    await execa("git", ["init"], { cwd: projectPath });
-    await execa("git", ["add", "."], { cwd: projectPath });
-    await execa("git", ["commit", "-m", "Initial commit"], {
-      cwd: projectPath,
-    });
-    spinner.succeed("Initialized git repository");
-  } catch (error) {
-    spinner.warn("Git initialization failed (this is not critical)");
-    const enhancedError = handleGitError(error as ExecaError, {
-      operation: "Git initialization",
-      projectPath,
-      command: "git init/add/commit",
-    });
-    enhancedError.display();
-  }
-}
-
-/**
- * Display manual setup instructions for when automated setup fails
- */
-function displayManualSetupInstructions(
-  projectName: string,
-  options: ProjectOptions,
-): void {
-  console.log(chalk.red("\n⚠️  Project created but requires manual setup:"));
-
-  if (!options.install) {
-    console.log(chalk.yellow("\n📦 Install dependencies:"));
-    console.log(chalk.cyan(`   cd ${projectName}`));
-    console.log(chalk.cyan("   pnpm install"));
-  }
-
-  if (options.orm === "prisma") {
-    console.log(chalk.yellow("\n🗄️  Set up database:"));
-    console.log(chalk.cyan("   cp .env.example .env"));
-    console.log(chalk.cyan("   cd packages/database && pnpm prisma generate"));
-    console.log(chalk.cyan("   cd packages/database && pnpm prisma db push"));
-  }
-
-  console.log(chalk.yellow("\n🚀 Start development:"));
-  console.log(chalk.cyan("   pnpm dev"));
-
-  console.log(
-    chalk.dim("\n💡 Need help? Check the README.md or report issues at:"),
-  );
-  console.log(
-    chalk.dim(
-      "   https://github.com/jarodtaylor/fastify-project-starter/issues",
-    ),
-  );
-
-  console.log(
-    chalk.red(
-      "\n❌ Setup incomplete - follow the steps above before running pnpm dev",
-    ),
-  );
-}
-
-/**
- * Display success message when project is created successfully
- */
-function displaySuccessMessage(
-  projectName: string,
-  options: ProjectOptions,
-): void {
-  console.log(chalk.green("\n✨ Project created successfully!"));
-  console.log(chalk.yellow("\nNext steps:"));
-  console.log(chalk.cyan(`  cd ${projectName}`));
-
-  // Provide database-specific instructions
-  if (options.orm === "prisma" && options.db !== "sqlite") {
-    console.log(
-      chalk.cyan(
-        `  # Set up your ${options.db.toUpperCase()} database first, then:`,
-      ),
-    );
-    console.log(chalk.cyan("  pnpm db:push"));
-  }
-
-  console.log(chalk.cyan("  pnpm dev"));
-  console.log(chalk.green("\nHappy coding! 🎉"));
-}
-
-async function validateProject(
-  projectPath: string,
-  options: ProjectOptions,
-): Promise<boolean> {
-  let hasErrors = false;
-
-  // Check if dependencies are installed by looking for node_modules
-  if (!existsSync(resolve(projectPath, "node_modules"))) {
-    hasErrors = true;
-  }
-
-  // Check if required packages exist
-  const requiredPackages = [
-    "packages/shared-utils",
-    "packages/typescript-config",
-  ];
-  if (options.orm === "prisma") {
-    requiredPackages.push("packages/database");
-  }
-
-  for (const pkg of requiredPackages) {
-    if (!existsSync(resolve(projectPath, pkg))) {
-      hasErrors = true;
-      break;
+    if (options.orm === "prisma" && options.db !== "sqlite") {
+      steps.splice(-1, 0, {
+        title: "Configure your database",
+        command: "# Edit .env file",
+        description: `Update DATABASE_URL in .env for ${options.db.toUpperCase()}`,
+      });
     }
-  }
 
-  return hasErrors;
+    logger.nextSteps(projectName, steps);
+
+    // Show useful commands
+    logger.section("Useful commands:");
+    logger.command("pnpm dev          # Start both API and web in development");
+    logger.command("pnpm build        # Build for production");
+    logger.command("pnpm lint         # Run linter");
+    logger.command("pnpm format       # Format code");
+
+    if (options.orm === "prisma") {
+      logger.command("pnpm db:studio    # Open Prisma Studio");
+    }
+
+    logger.break();
+    logger.dim("💡 Check the README.md for more detailed instructions");
+    logger.success("Happy coding! 🚀");
+  }
 }

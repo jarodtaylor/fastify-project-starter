@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import inquirer from "inquirer";
 import validateNpmPackageName from "validate-npm-package-name";
-import type { ProjectOptions } from "../create-project.js";
+import type { ProjectOptions } from "../types";
 
 // Constants for validation limits
 const MAX_PATH_LENGTH = process.platform === "win32" ? 260 : 4096;

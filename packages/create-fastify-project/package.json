@@ -1,6 +1,6 @@
 {
   "name": "create-fastify-project",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "type": "module",
   "description": "CLI tool to generate Fastify + React Router 7 monorepo projects",
   "main": "dist/index.js",
@@ -8,8 +8,7 @@
     "create-fastify-project": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && npm run copy-template",
-    "copy-template": "node scripts/copy-template.js",
+    "build": "tsup",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
@@ -31,21 +30,24 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "inquirer": "^12.0.0",
     "chalk": "^5.4.1",
-    "ora": "^8.1.0",
-    "fs-extra": "^11.2.0",
+    "commander": "^12.1.0",
     "ejs": "^3.1.10",
     "execa": "^9.5.1",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^12.0.0",
+    "ora": "^8.1.0",
+    "prompts": "^2.4.2",
     "validate-npm-package-name": "^6.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.15.29",
-    "@types/fs-extra": "^11.0.4",
     "@types/ejs": "^3.1.5",
+    "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.15.29",
+    "@types/prompts": "^2.4.9",
     "@types/validate-npm-package-name": "^4.0.2",
+    "tsup": "^8.5.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },

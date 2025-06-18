@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { cp, readdir, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import type { ProjectOptions } from "../create-project.js";
+import type { ProjectOptions } from "../types";
 
 const EXCLUDE_PATTERNS = [
   "node_modules",

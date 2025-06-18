@@ -91,6 +91,7 @@ jobs:
         run: |
           cd packages/create-fastify-project
           pnpm install --frozen-lockfile
+          echo "🔍 Running TypeScript type check for CLI..."
           pnpm typecheck
 
       - name: 🔍 Template type check

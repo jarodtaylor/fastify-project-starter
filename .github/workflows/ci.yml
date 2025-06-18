@@ -62,16 +62,21 @@ jobs:
           cd packages/create-fastify-project
           pnpm install --frozen-lockfile
 
-      - name: 🏗️ Build CLI
+      - name: 🏗️ Build CLI (tsup)
         run: |
           cd packages/create-fastify-project
           pnpm build
+          echo "📁 Build output verification:"
+          ls -la dist/ || echo "❌ No dist directory created"
+          test -f dist/index.js || { echo "❌ dist/index.js not found"; exit 1; }
 
       - name: 🧪 CLI Unit Tests
         run: |
           cd packages/create-fastify-project
           # Test CLI help and version (no project generation)
+          echo "🧪 Testing CLI help command:"
           node dist/index.js --help
+          echo "🧪 Testing CLI version command:"
           node dist/index.js --version
 
       - name: 📁 Verify Template Structure
